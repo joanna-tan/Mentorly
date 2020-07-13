@@ -22,4 +22,9 @@
     <string name="logout">Logout</string>
     <string name="register_your_account">Register your account</string>
     <string name="password_cap">Password</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="calendar">Calendar</string>
+    <string name="todo">ToDo</string>
+    <string name="chat">Chat</string>
 </resources>

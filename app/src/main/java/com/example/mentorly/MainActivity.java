@@ -5,16 +5,52 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.example.mentorly.fragments.CalendarFragment;
+import com.example.mentorly.fragments.ChatFragment;
+import com.example.mentorly.fragments.ToDoFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity {
+
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    private BottomNavigationView bottomNavigationView;
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        bottomNavigationView = findViewById(R.id.bottomNavigation);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Fragment fragment;
+                switch (menuItem.getItemId()) {
+                    case R.id.action_calendar:
+                        fragment = new CalendarFragment();
+                        break;
+                    case R.id.action_home:
+                        fragment = new ToDoFragment();
+                        break;
+                    case R.id.action_chat:
+                    default:
+                        fragment = new ChatFragment();
+                        break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                return true;
+            }
+        });
+        // Set default selection
+        bottomNavigationView.setSelectedItemId(R.id.action_home);
     }
 
     @Override
