@@ -63,7 +63,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_weight="1"
-        android:backgroundTint="#C1E449BE"
+        android:backgroundTint="#BF16DBF3"
         android:text="@string/login"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +79,7 @@
 
         android:layout_marginEnd="16dp"
         android:layout_weight="1"
-        android:backgroundTint="#A97407DF"
+        android:backgroundTint="#857407DF"
         android:text="@string/sign_up"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
