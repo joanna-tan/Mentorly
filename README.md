@@ -22,26 +22,37 @@ Integrated platform for building and sustaining 1:1 mentoring relationships.
 
 **Required Must-have Stories**
 
-* User can view upcoming/completed tasks of mentoring relationships (ToDo view)
+* User can login and register (backed by Parse backend)
+* User can add a profile picture using camera
+* User can view upcoming/completed tasks, ToDo view of mentoring relationship
 * Ability to add other users as a mentor/mentee and view a history of their interactions
-* User can view their mentor/mentee's schedule and request a meeting
+* User can view their mentor/mentee's schedule and request a meeting (Google Calendar SDK)
+   * Use OAuth login to send requests to Calendar API
 * Mentor/mentee exclusive chat window
+* Algorithm to keep track of mentor/mentee contact and send push notifications when there's been a lack of contact
+* Bottom navigation for switching between chat/calendar/ToDo view
+* Animation on ToDo items or chat messages
+* Double tap gesture recognition on ToDo or message (likes)
 
 **Optional Nice-to-have Stories**
 
 * Different facing interfaces for mentor/mentee
-    * mentor can add ToDo items, mentee can check off ToDo items
+    * Mentor can add ToDo items, mentee can check off ToDo items
 * Ability for mentor to request status updates & ability for mentee to upload status updates (pictures optional)
 * Organized resources tab (think bookmarks/Slack channels)
+    * Add material design e.g. cards for each resource
 * Integrate meet-up function into the app
     * Virtual video or phone call
     * In-person meet up spots (Yelp SDK)
 * Ability to add several users as mentors/mentees, and access these on a profile or settings tab
+* Profile tab: view profile picture and basic bio like current work/education; history of mentorship
+* (Stretch) offline availability
+
 
 ### 2. Screen Archetypes
 
 * Login
-* Register - User signs up or logs into their account
+   * User can login to account or register for an account
    * Upon Download/Reopening of the application, the user is prompted to log in to gain access to their profile information and to input the user id of their mentor/mentee match
 * Messaging Screen - Chat for users to communicate (direct 1-on-1)
    * Upon inputting mentor/mentee match, a 1:1 chat interface is creatd
@@ -51,8 +62,6 @@ Integrated platform for building and sustaining 1:1 mentoring relationships.
     * View each other's schedules and ability to request a meeting
 * Profile Screen
     * Allows users to upload a profile picture, change their name, add common info
-* Settings Screen
-    * Lets people adjust notification settings, language.
 
 ### 3. Navigation
 
@@ -78,5 +87,50 @@ Optional:
 ## Schema 
 
 ### Models
+#### ToDo Item
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the to-do item (default field) |
+   | author        | Pointer to User| item author |
+   | title        | String | summary of the to-do item|
+   | description       | String   | more info on the item (optional) |
+   | comments (stretch) | Array (Strings/Pointers)  | ability to add updates on a ToDo item |
+   | createdAt     | DateTime | date when post is created (default field) |
+   | updatedAt     | DateTime | date when post is last updated (default field) |
+   
+#### User
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the to-do item (default field) |
+   | username        | String | username for the user |
+   | partner        | Pointer to User | pointer to the user's mentoring match
+   | partners (stretch) | Array (Pointers)   | view all mentoring matches |
+   | profilePic| File  | user's profile picture |
 
 ### Networking
+#### List of network requests by screen
+   - ToDo List Screen
+      - (Read/GET) Query all to-do items
+      - (Create/POST) Create a new to-do item
+      - (Update/PUT) Mark to-do item as completed
+   - Create Post Screen
+      - (Create/POST) Create a new post object
+   - Profile Screen
+      - (Read/GET) Query logged in user object
+      - (Update/PUT) Update user profile image
+      
+#### [OPTIONAL] Existing API Endpoints
+##### Google Calendar
+- Base URL - https://www.googleapis.com/calendar/v3/calendars
+- https://www.googleapis.com/auth/calendar
+
+   HTTP Verb | Endpoint | Description
+   ----------|----------|------------
+    `GET`    | /calendarId/events | get all events, input calendar ID
+    `GET`    | /calendarId/events/eventId | return specific event by ID
+    `PUT`    | /calendarId/events/eventId | update specific event by ID
+    `POST`    | calendarId/events/quickAdd   | use a String to add an event
+    `POST`    | /calendarId/events  | add a new event to the calendar
+    `GET`    | /users/me/calendarList/calendarId  | retrieve all calendars for the current user
