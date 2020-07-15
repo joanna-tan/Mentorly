@@ -83,6 +83,7 @@ Optional:
 * Calendar -> View for scheduling a meeting
 
 ## Wireframes
+<img src='MentorlyWireframes.jpg' title='Wireframe' width='' alt='wireframe' />
 
 ## Schema 
 
