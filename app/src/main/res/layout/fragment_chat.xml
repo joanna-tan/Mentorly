@@ -6,9 +6,21 @@
     android:background="@android:color/white"
     tools:context=".fragments.ChatFragment">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvNoPair"
+        android:layout_gravity="center"
+        android:text="@string/no_pair_chat_view"
+        android:textColor="@android:color/black"
+        android:paddingHorizontal="20dp"
+        android:gravity="center_horizontal"
+        android:elevation="2dp"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/rlChatLayout"
         android:background="@android:color/white">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvChat"
@@ -38,7 +50,7 @@
                 android:hint="@string/message_hint"
                 android:inputType="textShortMessage"
                 android:imeOptions="actionSend"
-                />
+                android:importantForAutofill="no" />
             <Button
                 android:id="@+id/btSend"
                 android:layout_width="wrap_content"

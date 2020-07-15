@@ -67,7 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
         user.setUsername(username);
         user.setPassword(password);
 
-        // TODO: set user first/last names
+        // TODO: save user first/last names in Parse
 
         // Invoke signUpInBackground
         user.signUpInBackground(new SignUpCallback() {

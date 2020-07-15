@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,7 +22,6 @@ import com.example.mentorly.R;
 import com.example.mentorly.models.Message;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -32,14 +33,18 @@ public class ChatFragment extends Fragment {
 
     static final String TAG = "ChatFragment";
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
+    public static final String CHAT_PAIR_KEY = "pairID";
 
     List<Message> allMessages;
     ChatAdapter adapter;
     RecyclerView rvChat;
     EditText etMessage;
     Button btnSend;
+    TextView tvNoPair;
 
-    ArrayList<String> ids;
+    String pairUsername;
+    String pairId;
+    ParseUser pairPartner;
 
     // Keep track of initial load to scroll to the bottom of the ListView
     boolean mFirstLoad;
@@ -63,20 +68,29 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupMessagePosting(view);
+
+        //retrieve mentoring pair as a ParseUser
+        findPartnerId();
+
+        // If current user has no mentor, show text view and hide chat layout
+        tvNoPair = view.findViewById(R.id.tvNoPair);
+        if (pairPartner != null) {
+            setupMessagePosting(view);
+            tvNoPair.setVisibility(View.GONE);
+        } else {
+            RelativeLayout chatLayout = view.findViewById(R.id.rlChatLayout);
+            chatLayout.setVisibility(View.GONE);
+        }
     }
 
     //set up event handler which posts user message to Parse
     private void setupMessagePosting(View view) {
-        final String toId;
         // Initialize the fields and buttons
         etMessage = view.findViewById(R.id.etMessage);
         btnSend = view.findViewById(R.id.btSend);
         allMessages = new ArrayList<>();
         mFirstLoad = true;
         rvChat = view.findViewById(R.id.rvChat);
-
-        findPartnerId();
 
         adapter = new ChatAdapter(getContext(), ParseUser.getCurrentUser().getObjectId(), allMessages);
 
@@ -94,10 +108,14 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String data = etMessage.getText().toString();
+                if (data.isEmpty()) {
+                    Toast.makeText(getContext(), "Message cannot be empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Message message = new Message();
                 message.setBody(data);
                 message.setFromId(ParseUser.getCurrentUser());
-                //message.setToId(allUsers.get(0).getObjectId());
+                message.setToId(pairPartner);
 
                 message.saveInBackground(new SaveCallback() {
                     @Override
@@ -106,13 +124,14 @@ public class ChatFragment extends Fragment {
                         refreshMessages();
                     }
                 });
-
                 etMessage.setText(null);
             }
         });
     }
 
     // Query messages from Parse so we can load them into the chat adapter
+    // Retrieve messages where fromId == currentUser, toId == mentor
+    //      AND messages where fromId == mentor, toId == currentUser
     private void refreshMessages() {
         // Construct query to execute
         ParseQuery<Message> query = ParseQuery.getQuery(Message.class);
@@ -120,6 +139,13 @@ public class ChatFragment extends Fragment {
         query.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
         query.include(Message.FROM_ID_KEY);
         query.include(Message.TO_ID_KEY);
+
+        // Check if the messages are sent to/from the current user and their pair partner
+        ArrayList<ParseUser> users = new ArrayList<>();
+        users.add(ParseUser.getCurrentUser());
+        users.add(pairPartner);
+        query.whereContainedIn(Message.FROM_ID_KEY, users);
+        query.whereContainedIn(Message.TO_ID_KEY, users);
 
         // get the latest 50 messages, order will show up newest to oldest of this group
         query.orderByDescending("createdAt");
@@ -136,49 +162,34 @@ public class ChatFragment extends Fragment {
                         rvChat.scrollToPosition(0);
                         mFirstLoad = false;
                     }
-                }
-                else {
+                } else {
                     Log.e(TAG, "Error retrieving messages: " + e);
                 }
             }
         });
     }
 
-    //TODO: Retrieve pointer to current user's pairId
     private void findPartnerId() {
-        // fetch Messages where toId == ParseUser with object id XXX
-        ParseQuery query = new ParseQuery<>("Message")
-                .whereEqualTo("toId", ParseObject.createWithoutData(ParseUser.class, ParseUser.getCurrentUser().getObjectId()));
-        query.findInBackground(new FindCallback() {
-            @Override
-            public void done(List objects, ParseException e) {
+        ParseUser user = ParseUser.getCurrentUser();
+        try {
+            // fetch all fields of user data in sync task
+            user.fetch();
+            ParseUser mentor = user.getParseUser(CHAT_PAIR_KEY);
+            pairPartner = mentor;
 
+            // retrieve pairPartner data if it exists
+            if (mentor != null) {
+                mentor.fetch();
+                pairId = pairPartner.getObjectId();
+                pairUsername = pairPartner.getUsername();
+            }
+            else {
+                Log.i(TAG, "No mentor found for " + user.getUsername());
             }
 
-            @Override
-            public void done(Object o, Throwable throwable) {
-
-            }
-        });
-
-        ParseQuery<ParseUser> parseUserParseQuery = ParseUser.getQuery();
-        parseUserParseQuery.include("pairID");
-        ids = new ArrayList<>();
-        parseUserParseQuery.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> pairs, ParseException e) {
-                if (e == null) {
-                    if (pairs.size() > 0) {
-                        for (ParseUser user : pairs) {
-                            ids.add(user.getObjectId());
-                        }
-                    }
-                }
-                else {
-                    Log.e(TAG, "Error retrieving pair" + e);
-                }
-            }
-        });
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
 }

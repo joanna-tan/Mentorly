@@ -31,4 +31,5 @@
     <string name="profile_other">Other profile pic</string>
     <string name="message_hint">Say anything</string>
     <string name="send">Send</string>
+    <string name="no_pair_chat_view">Looks like you don\'t have a mentor/mentee yet. Set up a connection in profile to chat!</string>
 </resources>
