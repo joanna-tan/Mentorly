@@ -3,23 +3,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
     tools:context=".fragments.ChatFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/btnCalendar"
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChat"
+            android:transcriptMode="alwaysScroll"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_above="@+id/rlSend"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chat Button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="match_parent" />
+        <RelativeLayout
+            android:id="@+id/rlSend"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:paddingTop="5dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_height="wrap_content" >
+            <EditText
+                android:id="@+id/etMessage"
+                android:layout_toStartOf="@+id/btSend"
+                android:layout_alignBottom="@+id/btSend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:hint="@string/message_hint"
+                android:inputType="textShortMessage"
+                android:imeOptions="actionSend"
+                />
+            <Button
+                android:id="@+id/btSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingEnd="10dp"
+                android:layout_alignParentEnd="true"
+                android:text="@string/send"
+                android:textSize="18sp" >
+            </Button>
+        </RelativeLayout>
+    </RelativeLayout>
 
 </FrameLayout>
