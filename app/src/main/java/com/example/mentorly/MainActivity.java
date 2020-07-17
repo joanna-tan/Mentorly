@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.mentorly.fragments.CalendarFragment;
 import com.example.mentorly.fragments.ChatFragment;
+import com.example.mentorly.fragments.ProfileFragment;
 import com.example.mentorly.fragments.ToDoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
@@ -41,8 +42,11 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new ToDoFragment();
                         break;
                     case R.id.action_chat:
-                    default:
                         fragment = new ChatFragment();
+                        break;
+                    case R.id.action_profile:
+                    default:
+                        fragment = new ProfileFragment();
                         break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();

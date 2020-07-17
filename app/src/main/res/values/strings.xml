@@ -22,14 +22,13 @@
     <string name="logout">Logout</string>
     <string name="register_your_account">Register your account</string>
     <string name="password_cap">Password</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="calendar">Calendar</string>
-    <string name="todo">ToDo</string>
-    <string name="chat">Chat</string>
     <string name="profile_me">My Profile Pic</string>
     <string name="profile_other">Other profile pic</string>
     <string name="message_hint">Say anything</string>
     <string name="send">Send</string>
     <string name="no_pair_chat_view">Looks like you don\'t have a mentor/mentee yet. Set up a connection in profile to chat!</string>
+    <string name="chat">Chat</string>
+    <string name="todo">ToDo</string>
+    <string name="calendar">Calendar</string>
 </resources>

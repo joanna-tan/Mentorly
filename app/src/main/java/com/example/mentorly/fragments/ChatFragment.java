@@ -34,6 +34,7 @@ public class ChatFragment extends Fragment {
     static final String TAG = "ChatFragment";
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
     public static final String CHAT_PAIR_KEY = "pairID";
+    public static final String USERNAME_KEY = "username";
 
     List<Message> allMessages;
     ChatAdapter adapter;

@@ -6,20 +6,25 @@
         android:id="@+id/action_calendar"
         android:icon="@drawable/ic_outline_calendar_today_24"
         android:iconTint="@android:color/white"
-        android:title="Calendar"
-        app:showAsAction="ifRoom" />
+        android:title="@string/calendar"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_home"
         android:icon="@android:drawable/btn_star_big_on"
-        android:title="ToDo"
+        android:title="@string/todo"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_chat"
         android:icon="@drawable/ic_baseline_chat_24"
         android:iconTint="@android:color/white"
-        android:title="Chat"
-        app:showAsAction="always" />
+        android:title="@string/chat"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_profile"
+        android:icon="@drawable/ic_baseline_person_24"
+        app:showAsAction="ifRoom"
+        android:title="Profile" />
 
 </menu>
