@@ -21,14 +21,13 @@ import com.example.mentorly.ChatAdapter;
 import com.example.mentorly.GlideApp;
 import com.example.mentorly.R;
 import com.example.mentorly.models.PairRequest;
-import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -43,10 +42,15 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
     TextView tvPairUsername;
     Button btnAddPairPartner;
     Button btnDeletePairPartner;
+    Button btnAcceptRequest;
+    Button btnRejectRequest;
+    TextView tvPairProfile;
 
     ParseUser user;
     ParseUser pairPartner;
     boolean hasPendingRequests;
+    PairRequest pendingAcceptRequests;
+    PairRequest pendingSentRequests;
 
     public ProfileFragment() {
     }
@@ -74,6 +78,9 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         tvPairUsername = view.findViewById(R.id.tvPairUsername);
         btnAddPairPartner = view.findViewById(R.id.btnAddPairPartner);
         btnDeletePairPartner = view.findViewById(R.id.btnDeletePairPartner);
+        btnAcceptRequest = view.findViewById(R.id.btnAddRequest);
+        btnRejectRequest = view.findViewById(R.id.btnRejectRequest);
+        tvPairProfile = view.findViewById(R.id.tvPairProfile);
 
         user = ParseUser.getCurrentUser();
 
@@ -95,12 +102,11 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         // If the user has a pending request, set their pairPartner to null
         checkIfPairRequestPending(pairPartner);
 
-        // TODO: send a Parse query to check if the current user has any pending requests to accept
-
         // If current user is paired with no pending request, load their partner info
         if (pairPartner != null && !hasPendingRequests) {
             btnAddPairPartner.setVisibility(View.GONE);
-
+            btnAcceptRequest.setVisibility(View.GONE);
+            btnRejectRequest.setVisibility(View.GONE);
 
             tvPairUsername.setText(pairPartner.getUsername());
             ParseFile pairProfileImage = pairPartner.getParseFile(ChatAdapter.PROFILE_IMAGE_KEY);
@@ -122,13 +128,84 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         }
 
         // If current user has a pending request, load "request pending" into text view and hide add/delete buttons
-        else if (hasPendingRequests) {
+        else if (hasPendingRequests && pendingAcceptRequests == null) {
             ivPairProfileImage.setVisibility(View.GONE);
             btnAddPairPartner.setVisibility(View.GONE);
-            btnDeletePairPartner.setVisibility(View.GONE);
+            btnAcceptRequest.setVisibility(View.GONE);
+            btnRejectRequest.setVisibility(View.GONE);
 
             tvPairUsername.setText("Your request is currently pending...");
+            btnDeletePairPartner.setVisibility(View.VISIBLE);
+            btnDeletePairPartner.setText("Delete pair request");
 
+            btnDeletePairPartner.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    pendingSentRequests.deleteInBackground();
+                    hasPendingRequests = false;
+                    pendingSentRequests.saveInBackground();
+
+                    user.put(IS_PAIRED_KEY, false);
+                    user.remove(ChatFragment.CHAT_PAIR_KEY);
+                    user.saveInBackground();
+
+                    refreshFragment();
+
+                }
+            });
+
+        }
+
+        // If current user has a valid pending request, display all requests for action
+        else if (hasPendingRequests) {
+            tvPairProfile.setText("Pending requests:");
+            btnAddPairPartner.setVisibility(View.GONE);
+            btnDeletePairPartner.setVisibility(View.GONE);
+            btnAcceptRequest.setVisibility(View.VISIBLE);
+            btnRejectRequest.setVisibility(View.VISIBLE);
+
+            ParseUser sendingUser = pendingAcceptRequests.getUserSending();
+            tvPairUsername.setText(sendingUser.getUsername());
+
+            ParseFile sendingUserProfileImage = sendingUser.getParseFile(ChatAdapter.PROFILE_IMAGE_KEY);
+
+            if (sendingUserProfileImage != null) {
+                GlideApp.with(getContext())
+                        .load(sendingUserProfileImage.getUrl())
+                        .transform(new RoundedCornersTransformation(50, 20))
+                        .into(ivPairProfileImage);
+            } else {
+                ivPairProfileImage.setImageResource(R.drawable.ic_baseline_person_24);
+            }
+
+
+            // when yes is clicked, refresh the fragment and validate the request
+            btnAcceptRequest.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ParseUser userSending = pendingAcceptRequests.getUserSending();
+                    user.put(ChatFragment.CHAT_PAIR_KEY, userSending);
+                    user.put(IS_PAIRED_KEY, true);
+                    user.saveInBackground();
+                    hasPendingRequests = false;
+
+                    pendingAcceptRequests.setIsAccepted(true);
+                    pendingAcceptRequests.saveInBackground();
+
+                    refreshFragment();
+                }
+            });
+
+            // when no is clicked, set requestRejected to true and refresh the fragment to display add button
+            btnRejectRequest.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    pendingAcceptRequests.setIsRejected(true);
+                    pendingAcceptRequests.saveInBackground();
+
+                    refreshFragment();
+                }
+            });
         }
 
         // Show only the addPair button if the current user has no mentor assigned & no pending requests
@@ -136,6 +213,8 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
             ivPairProfileImage.setVisibility(View.GONE);
             tvPairUsername.setVisibility(View.GONE);
             btnDeletePairPartner.setVisibility(View.GONE);
+            btnAcceptRequest.setVisibility(View.GONE);
+            btnRejectRequest.setVisibility(View.GONE);
 
             btnAddPairPartner.setVisibility(View.VISIBLE);
 
@@ -144,15 +223,15 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
             btnAddPairPartner.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showAlertDialog();
+                    showAddMentorDialog();
                 }
             });
         }
 
     }
 
-    // Query requests where userSending is currentUser && userReceiving is the pairingPartner
     private void checkIfPairRequestPending(final ParseUser pairingPartner) {
+        // First, query requests where userSending is currentUser && userReceiving is the pairingPartner
         if (pairingPartner != null) {
             ParseQuery<PairRequest> pairRequestQuery = ParseQuery.getQuery(PairRequest.class);
             pairRequestQuery.include(PairRequest.USER_SENDING_KEY);
@@ -164,7 +243,42 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
                 ArrayList pairRequests = (ArrayList) pairRequestQuery.find();
                 if (!pairRequests.isEmpty()) {
                     pairPartner = null;
-                    hasPendingRequests = true;
+                    pendingSentRequests = (PairRequest) pairRequests.get(0);
+
+                    // if the request has been rejected, delete the request
+                    if (pendingSentRequests.getIsRejected()){
+                        pendingSentRequests.deleteInBackground();
+                    }
+
+                    // if the request has been accepted, delete the request and set the user fields as appropriate
+                    else if (pendingSentRequests.getIsAccepted()) {
+                        pendingSentRequests.deleteInBackground();
+                    }
+
+                    // if the request is neither accepted or rejected, show it as pending
+                    else {
+                        hasPendingRequests = true;
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // if the pairingPartner is null, do a query to search for any pending requests to accept
+        else {
+            ParseQuery<PairRequest> acceptRequestQuery = ParseQuery.getQuery(PairRequest.class);
+            acceptRequestQuery.include(PairRequest.USER_SENDING_KEY);
+            acceptRequestQuery.include(PairRequest.USER_RECEIVING_KEY);
+            acceptRequestQuery.whereEqualTo(PairRequest.USER_RECEIVING_KEY, user);
+
+            try {
+                // there might a potential bug where multiple requests are sent to the same user
+                // for now, only retrieve the first request for action
+                PairRequest pairRequest = acceptRequestQuery.getFirst();
+                if (pairRequest != null) {
+                    pendingAcceptRequests = pairRequest;
+                    hasPendingRequests = !pairRequest.getIsRejected();
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -172,17 +286,25 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         }
     }
 
-    private void showAlertDialog() {
-        FragmentManager fm = getParentFragmentManager();
-        EditMentorDialogFragment editNameDialogFragment = EditMentorDialogFragment.newInstance("Enter mentor name");
-        // SETS the target fragment for use later when sending results
-        editNameDialogFragment.setTargetFragment(ProfileFragment.this, 300);
-        editNameDialogFragment.show(fm, "fragment_edit_name");
+    // Set a pair request between current user and pairingUpPartner
+    private void sendPairRequest(ParseUser pairingUpPartner) {
+        PairRequest newRequest = new PairRequest();
+        newRequest.put(PairRequest.USER_SENDING_KEY, ParseUser.getCurrentUser());
+        newRequest.put(PairRequest.USER_RECEIVING_KEY, pairingUpPartner);
+        newRequest.saveInBackground();
+        Toast.makeText(getContext(), "Request sent!", Toast.LENGTH_SHORT).show();
+
+        /* Set the current user's pair partner to their pairRequest;
+          but unless the pairRequest is accepted, this info won't show up in profileFragment */
+        user.put(ChatFragment.CHAT_PAIR_KEY, pairingUpPartner);
+        user.put(IS_PAIRED_KEY, true);
+        user.saveInBackground();
     }
 
+
+    // Fetch all of the fields of current user data before loading the profile fragment
     private void findPartnerId() {
         try {
-            // fetch all fields of user data in sync task
             user.fetch();
             ParseUser mentor = user.getParseUser(ChatFragment.CHAT_PAIR_KEY);
             pairPartner = mentor;
@@ -199,38 +321,39 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         }
     }
 
-    // Retrieve input username and send request to Parse to attempt adding user
+    // Show a dialog for inputting a pairing username
+    private void showAddMentorDialog() {
+        FragmentManager fm = getParentFragmentManager();
+        EditMentorDialogFragment editNameDialogFragment = EditMentorDialogFragment.newInstance("Enter mentor name");
+        // Sets the profile fragment as target for sending results
+        editNameDialogFragment.setTargetFragment(ProfileFragment.this, 300);
+        editNameDialogFragment.show(fm, "fragment_edit_name");
+    }
+
+    // Retrieve input username from the dialog and send request to Parse to attempt adding user
     @Override
     public void onFinishEditDialog(final String pairUsername) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.include(IS_PAIRED_KEY);
         query.whereEqualTo(ChatFragment.USERNAME_KEY, pairUsername);
+        query.include(IS_PAIRED_KEY);
 
-        // Find user with unique username
-        query.findInBackground(new FindCallback<ParseUser>() {
+        // Find the user with the input unique username
+        query.getFirstInBackground(new GetCallback<ParseUser>() {
             @Override
-            public void done(List<ParseUser> users, ParseException e) {
-                if (!users.isEmpty()) {
+            public void done(ParseUser object, ParseException e) {
+                if (object != null) {
                     // If a user with the username is found, check if they're already paired
-                    boolean usernamePaired = (boolean) users.get(0).get(IS_PAIRED_KEY);
-
+                    boolean usernamePaired = (boolean) object.get(IS_PAIRED_KEY);
                     // If user is already paired, show Toast saying that pairing failed
                     if (usernamePaired) {
                         Toast.makeText(getContext(), "Pairing failed, " + pairUsername + " is already paired", Toast.LENGTH_SHORT).show();
                     }
-
                     // Else send a pair request and refresh the fragment to show request pending
                     else {
-                        sendPairRequest(users.get(0));
-
-                        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                        if (Build.VERSION.SDK_INT >= 26) {
-                            ft.setReorderingAllowed(false);
-                        }
-                        ft.detach(ProfileFragment.this).attach(ProfileFragment.this).commit();
+                        sendPairRequest(object);
+                        refreshFragment();
                     }
                 }
-
                 // Show toast error message if the user can't be found
                 else {
                     Toast.makeText(getContext(), "Sorry, couldn't find user " + pairUsername, Toast.LENGTH_SHORT).show();
@@ -239,29 +362,17 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         });
     }
 
-    // Create a pairing relationship between current user and pairingUpPartner
-    private void sendPairRequest(ParseUser pairingUpPartner) {
-        PairRequest newRequest = new PairRequest();
-        newRequest.put(PairRequest.USER_SENDING_KEY, ParseUser.getCurrentUser());
-        newRequest.put(PairRequest.USER_RECEIVING_KEY, pairingUpPartner);
-        newRequest.saveInBackground();
-        Toast.makeText(getContext(), "Request sent!", Toast.LENGTH_SHORT).show();
-
-        /* Set the current user's pair partner to their pairRequest;
-          but unless the pairRequest is accepted, this info won't show up in profileFragment */
-        user.put(ChatFragment.CHAT_PAIR_KEY, pairingUpPartner);
-        user.put(IS_PAIRED_KEY, true);
-        user.saveInBackground();
-    }
-
-    // Method for deleting a pairing relationship and refresh the fragment
+    // Method for deleting a pairing relationship
     // TODO: add confirmation dialog popup before deleting
     private void deletePairing() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        currentUser.remove(ChatFragment.CHAT_PAIR_KEY);
-        currentUser.remove(IS_PAIRED_KEY);
-        currentUser.saveInBackground();
+        user.remove(ChatFragment.CHAT_PAIR_KEY);
+        user.put(IS_PAIRED_KEY, false);
+        user.saveInBackground();
+        refreshFragment();
+    }
 
+    // Method to refresh the fragment view when an action has been performed
+    private void refreshFragment() {
         FragmentTransaction ft = getParentFragmentManager().beginTransaction();
         if (Build.VERSION.SDK_INT >= 26) {
             ft.setReorderingAllowed(false);

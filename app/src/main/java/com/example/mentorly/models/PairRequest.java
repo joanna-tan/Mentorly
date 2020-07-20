@@ -19,12 +19,12 @@ public class PairRequest extends ParseObject {
         return getParseUser(USER_RECEIVING_KEY);
     }
 
-    public String getIsAccepted() {
-        return getString(CHECK_ACCEPTED_KEY);
+    public boolean getIsAccepted() {
+        return getBoolean(CHECK_ACCEPTED_KEY);
     }
 
-    public String getIsRejected() {
-        return getString(CHECK_REJECTED_KEY);
+    public boolean getIsRejected() {
+        return getBoolean(CHECK_REJECTED_KEY);
     }
 
     public void setUserSending(ParseUser userSending) {

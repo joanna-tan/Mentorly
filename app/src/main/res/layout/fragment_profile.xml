@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/tvPairHeader"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".fragments.ProfileFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,9 +68,9 @@
             android:layout_marginTop="10dp"
             android:fontFamily="sans-serif-light"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/ivPairProfileImage"
+            app:layout_constraintBottom_toTopOf="@id/btnDeletePairPartner"
             app:layout_constraintStart_toEndOf="@+id/ivPairProfileImage"
-            app:layout_constraintTop_toTopOf="@+id/ivPairProfileImage"
+            app:layout_constraintTop_toBottomOf="@+id/tvPairProfile"
             tools:text="\@alice" />
 
         <Button
@@ -91,13 +91,42 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:elevation="1dp"
             android:text="Click to remove mentoring partner"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ivPairProfileImage" />
+
+        <Button
+            android:id="@+id/btnAddRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="@android:color/holo_blue_bright"
+            android:elevation="1dp"
+            android:text="Yes"
+            app:layout_constraintEnd_toStartOf="@id/btnRejectRequest"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivPairProfileImage" />
+
+        <Button
+            android:id="@+id/btnRejectRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:elevation="1dp"
+            android:text="No"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnAddRequest"
+            app:layout_constraintTop_toBottomOf="@+id/ivPairProfileImage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>
