@@ -35,6 +35,8 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
     RecyclerView rvItems;
     Button btnAdd;
     ToDoAdapter adapter;
+    ParseUser currentUser;
+    ParseUser pairPartner;
 
     public ToDoFragment() {
         // Required empty public constructor
@@ -55,6 +57,8 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        currentUser = ParseUser.getCurrentUser();
+        findPartnerId();
 
         items = new ArrayList<>();
         rvItems = view.findViewById(R.id.rvItems);
@@ -110,16 +114,19 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
 
     @Override
     public void onFinishEditDialog(String title, String body) {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
         // Create a new To Do item and saveInBackground to ParseServer
         ToDoItem newItem = new ToDoItem();
         newItem.setTitle(title);
         if (body != null && !body.equals("")) {
             newItem.setBody(body);
         }
+
         List<ParseUser> users = new ArrayList<>();
         users.add(currentUser);
+        if (pairPartner != null) {
+            users.add(pairPartner);
+        }
+
         newItem.setUsers(users);
 
         newItem.saveInBackground(new SaveCallback() {
@@ -134,5 +141,24 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
             }
         });
 
+    }
+
+    // Fetch all of the fields of current user data before loading the profile fragment
+    private void findPartnerId() {
+        try {
+            currentUser.fetch();
+            ParseUser mentor = currentUser.getParseUser(ChatFragment.CHAT_PAIR_KEY);
+            pairPartner = mentor;
+
+            // retrieve pairPartner data if it exists
+            if (mentor != null) {
+                mentor.fetch();
+            } else {
+                Log.i(TAG, "No mentor found for " + currentUser.getUsername());
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }
