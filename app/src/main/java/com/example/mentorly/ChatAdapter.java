@@ -49,11 +49,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         if (isMe) {
             holder.imageMe.setVisibility(View.VISIBLE);
             holder.imageOther.setVisibility(View.GONE);
-            holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
+            holder.bodyOther.setVisibility(View.GONE);
+            holder.bodyMe.setVisibility(View.VISIBLE);
+
+            holder.bodyMe.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
+            holder.bodyMe.setText(message.getBody());
+
         } else {
             holder.imageOther.setVisibility(View.VISIBLE);
             holder.imageMe.setVisibility(View.GONE);
-            holder.body.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+            holder.bodyMe.setVisibility(View.GONE);
+            holder.bodyOther.setVisibility(View.VISIBLE);
+
+
+            holder.bodyOther.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+            holder.bodyOther.setText(message.getBody());
         }
 
         final ImageView profileView = isMe ? holder.imageMe : holder.imageOther;
@@ -71,7 +81,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         else {
             profileView.setImageResource(R.drawable.ic_baseline_person_24);
         }
-        holder.body.setText(message.getBody());
+
     }
 
     @Override
@@ -82,13 +92,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageOther;
         ImageView imageMe;
-        TextView body;
+        TextView bodyOther;
+        TextView bodyMe;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageOther = itemView.findViewById(R.id.ivProfileOther);
             imageMe = itemView.findViewById(R.id.ivProfileMe);
-            body = itemView.findViewById(R.id.tvBody);
+            bodyOther = itemView.findViewById(R.id.tvBodyOther);
+            bodyMe = itemView.findViewById(R.id.tvBodyMe);
         }
     }
 }
