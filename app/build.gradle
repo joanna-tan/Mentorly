@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.0"
@@ -12,7 +16,19 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Room schemas
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+        buildConfigField("String", "CONSUMER_KEY", apikeyProperties['CONSUMER_KEY'])
+        buildConfigField("String", "CONSUMER_SECRET", apikeyProperties['CONSUMER_SECRET'])
     }
+
+
+
 
     buildTypes {
         release {
@@ -30,6 +46,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.gms:play-services-auth:18.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -44,4 +61,12 @@ dependencies {
     implementation 'jp.wasabeef:glide-transformations:4.1.0'
     // If you want to use the GPU Filters
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
+
+    implementation fileTree(dir: 'libs', include: '*.jar')
+    implementation 'com.codepath.libraries:android-oauth-handler:2.2.0'
+    implementation 'commons-codec:commons-codec:1.10'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    implementation 'net.openid:appauth:0.2.0'
+
 }

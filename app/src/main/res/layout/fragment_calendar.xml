@@ -8,18 +8,79 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        >
+
+        <TextView
+            android:id="@+id/tvCalendarWelcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="@string/calendar"
+            />
 
         <Button
-            android:id="@+id/btnCalendar"
+            android:id="@+id/btnSignIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calendar Button"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="Make Authorization Request"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.445"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/tvCalendarWelcome" />
 
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            app:layout_constraintRight_toLeftOf="@id/llProfileInfo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnSignIn"
+            tools:src="@tools:sample/avatars"
+            android:layout_marginEnd="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/llProfileInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="6"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toRightOf="@id/profileImage"
+            app:layout_constraintTop_toBottomOf="@id/btnSignIn"
+            app:layout_constraintRight_toRightOf="parent"
+            >
+
+            <TextView
+                android:id="@+id/givenName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                tools:text="Some first name"
+                />
+
+            <TextView
+                android:id="@+id/familyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                tools:text="Some LastName"
+                />
+
+            <TextView
+                android:id="@+id/fullName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                tools:text="Some FirstName LastName"
+                />
+
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
