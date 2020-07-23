@@ -6,7 +6,7 @@ apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
         applicationId "com.example.mentorly"
@@ -68,5 +68,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
     implementation 'net.openid:appauth:0.2.0'
+    implementation 'com.google.android.gms:play-services-auth:18.1.0'
+
 
 }
