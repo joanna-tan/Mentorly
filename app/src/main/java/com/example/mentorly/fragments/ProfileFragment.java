@@ -135,6 +135,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
                 ivPairProfileImage.setImageResource(R.drawable.ic_baseline_person_24);
             }
 
+            btnDeletePairPartner.setVisibility(View.GONE);
             btnDeletePairPartner.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
