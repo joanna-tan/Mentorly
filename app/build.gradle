@@ -25,6 +25,10 @@ android {
         }
         buildConfigField("String", "CONSUMER_KEY", apikeyProperties['CONSUMER_KEY'])
         buildConfigField("String", "CONSUMER_SECRET", apikeyProperties['CONSUMER_SECRET'])
+
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES'
+        }
     }
 
 
@@ -46,10 +50,10 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.gms:play-services-auth:18.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
 
     implementation 'com.github.parse-community.Parse-SDK-Android:parse:1.24.2'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1' // for logging API calls to LogCat
@@ -70,5 +74,5 @@ dependencies {
     implementation 'net.openid:appauth:0.2.0'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
 
-
+    implementation 'com.google.apis:google-api-services-calendar:v3-rev20200610-1.30.10'
 }

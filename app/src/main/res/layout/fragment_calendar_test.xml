@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="welcome_to_appauth"
+        android:text="Calendar"
         android:textAppearance="?android:textAppearanceMedium" />
 
     <Button
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/action_margin"
         android:layout_marginRight="@dimen/action_margin"
-        android:text="make_authorization_request" />
+        android:text="Sign in with Google" />
 
     <Button
         android:id="@+id/makeApiCall"
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/action_margin"
         android:layout_marginRight="@dimen/action_margin"
-        android:text="make_api_call"
+        android:text="Load Calendar info"
         android:visibility="gone"
         />
 
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/action_margin"
         android:layout_marginRight="@dimen/action_margin"
-        android:text="sign_out"
+        android:text="Sign out of Google"
         android:visibility="gone" />
 
     <LinearLayout
@@ -50,7 +50,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/action_margin"
         android:layout_marginRight="@dimen/action_margin"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone"
+        >
 
         <ImageView
             android:id="@+id/profileImage"
@@ -96,5 +98,10 @@
 
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEvents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
