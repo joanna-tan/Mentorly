@@ -403,7 +403,6 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
     }
 
     // Method for deleting a pairing relationship
-    // TODO: add confirmation dialog popup before deleting
     private void deletePairing() {
         user.remove(ChatFragment.CHAT_PAIR_KEY);
         user.put(IS_PAIRED_KEY, false);
