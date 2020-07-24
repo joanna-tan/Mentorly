@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,15 +28,18 @@ import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
-public class ProfileFragment extends Fragment implements EditMentorDialogFragment.EditMentorDialogListener {
+public class ProfileFragment extends Fragment implements AddPictureDialog.AddPictureDialogListener, EditMentorDialogFragment.EditMentorDialogListener {
 
     public static final String TAG = "ProfileFragment";
     public static final String IS_PAIRED_KEY = "isPaired";
+    public static final String PROFILE_IMAGE_KEY = "profileImage";
 
+    // views
     ImageView ivProfileImage;
     TextView tvUsername;
     ImageView ivPairProfileImage;
@@ -45,7 +49,9 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
     Button btnAcceptRequest;
     Button btnRejectRequest;
     TextView tvPairProfile;
+    ImageButton btnChangeProfilePic;
 
+    // handle user info and pairing info
     ParseUser user;
     ParseUser pairPartner;
     boolean hasPendingRequests;
@@ -81,6 +87,7 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         btnAcceptRequest = view.findViewById(R.id.btnAddRequest);
         btnRejectRequest = view.findViewById(R.id.btnRejectRequest);
         tvPairProfile = view.findViewById(R.id.tvPairProfile);
+        btnChangeProfilePic = view.findViewById(R.id.btnChangeProfilePic);
 
         user = ParseUser.getCurrentUser();
 
@@ -95,6 +102,15 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
         } else {
             ivProfileImage.setImageResource(R.drawable.ic_baseline_person_24);
         }
+
+        // bring up UI for user to change their picture
+        btnChangeProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch picture dialog to display image preview after camera is clicked
+                showAddPictureDialog();
+            }
+        });
 
         // fetch all the fields of the current user, including pairPartner
         findPartnerId();
@@ -230,6 +246,29 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
 
     }
 
+
+    // Bring up the add picture fragment
+    private void showAddPictureDialog() {
+        FragmentManager fm = getParentFragmentManager();
+        AddPictureDialog editNameDialogFragment = AddPictureDialog.newInstance("Add picture");
+        // Sets the profile fragment for use later when sending photo
+        editNameDialogFragment.setTargetFragment(ProfileFragment.this, 300);
+        editNameDialogFragment.show(fm, "fragment_edit_picture");
+    }
+
+
+    // Retrieve the photo file from the addPictureDialog and save it as as the current user's image
+    @Override
+    public void onFinishAddPictureDialog(File photo) {
+        user.put(PROFILE_IMAGE_KEY, new ParseFile(photo));
+        try {
+            user.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        refreshFragment();
+    }
+
     private void checkIfPairRequestPending(final ParseUser pairingPartner) {
         // First, query requests where userSending is currentUser && userReceiving is the pairingPartner
         if (pairingPartner != null) {
@@ -332,7 +371,7 @@ public class ProfileFragment extends Fragment implements EditMentorDialogFragmen
 
     // Retrieve input username from the dialog and send request to Parse to attempt adding user
     @Override
-    public void onFinishEditDialog(final String pairUsername) {
+    public void onFinishEditMentorDialog(final String pairUsername) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo(ChatFragment.USERNAME_KEY, pairUsername);
         query.include(IS_PAIRED_KEY);

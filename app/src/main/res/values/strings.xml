@@ -31,4 +31,10 @@
     <string name="chat">Chat</string>
     <string name="todo">ToDo</string>
     <string name="calendar">Calendar</string>
+    <string name="intent_host">cprest</string>
+    <string name="intent_scheme">oauth</string>
+
+<!--    API calls-->
+    <string name="request_complete">API Call Successful.</string>
+    <string name="request_failed">API Call Failed.</string>
 </resources>
