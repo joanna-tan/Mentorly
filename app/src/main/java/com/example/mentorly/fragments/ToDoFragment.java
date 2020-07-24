@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mentorly.R;
 import com.example.mentorly.ToDoAdapter;
 import com.example.mentorly.models.ToDoItem;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -33,7 +33,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
     public static final String TAG = "ToDoFragment";
     List<ToDoItem> items;
     RecyclerView rvItems;
-    Button btnAdd;
+    FloatingActionButton btnAdd;
     ToDoAdapter adapter;
     ParseUser currentUser;
     ParseUser pairPartner;

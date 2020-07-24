@@ -7,49 +7,55 @@
     android:background="#FFFFFF"
     tools:context=".fragments.ToDoFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvItems"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_above="@+id/btnAddToDo"
-            android:layout_alignParentStart="true"
-            app:layout_constraintBottom_toTopOf="@+id/btnAddToDo"
-            app:layout_constraintTop_toBottomOf="@+id/tvObjectives" />
 
-        <Button
-            android:id="@+id/btnAddToDo"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="Add item"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rvItems" />
+            android:layout_height="match_parent"
+            android:id="@+id/clToDoItems"
+            >
 
-        <TextView
-            android:id="@+id/tvObjectives"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                app:layout_constraintTop_toBottomOf="@+id/tvObjectives"
+
+                />
+
+            <TextView
+                android:id="@+id/tvObjectives"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/satisfy"
+                android:text="Objectives"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_constraintBottom_toTopOf="@+id/rvItems"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:fontFamily="@font/satisfy"
-            android:text="Objectives"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintBottom_toTopOf="@+id/rvItems"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:id="@+id/btnAddToDo"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_baseline_add_24"
+            android:tint="#FFFFFF"
+            app:layout_anchor="@id/clToDoItems"
+            app:layout_anchorGravity="bottom|right|end"
+            app:layout_behavior=".ScrollAwareFABBehavior"
+            />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </FrameLayout>

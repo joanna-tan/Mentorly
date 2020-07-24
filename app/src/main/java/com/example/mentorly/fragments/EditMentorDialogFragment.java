@@ -64,14 +64,14 @@ public class EditMentorDialogFragment extends DialogFragment {
 
     // Defines the listener interface
     public interface EditMentorDialogListener {
-        void onFinishEditDialog(String inputText);
+        void onFinishEditMentorDialog(String inputText);
     }
 
     // Call this method to send the data back to the parent fragment
     public void sendBackResult() {
         // Notice the use of `getTargetFragment` which will be set when the dialog is displayed
         EditMentorDialogListener listener = (EditMentorDialogListener) getTargetFragment();
-        listener.onFinishEditDialog(mEditText.getText().toString());
+        listener.onFinishEditMentorDialog(mEditText.getText().toString());
         dismiss();
     }
 
