@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +44,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.parse.ParseUser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,11 +53,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 
-public class CalendarFragment extends Fragment {
+public class CalendarFragment extends Fragment implements AddEventDialogFragment.AddEventDialogFragmentListener {
 
     // Projection array. Creating indices for this array instead of doing
     // dynamic lookups improves performance.
@@ -78,25 +81,29 @@ public class CalendarFragment extends Fragment {
     // Save user logged in info
     private String emailUsername;
     public static final String GOOGLE_MAIL = "com.google";
-
-    final int callbackId = 412;
+    private long calendarId;
 
     public static final String TAG = "CalendarFragment";
+    public static final String PUBLIC_EMAIL_KEY = "publicEmail";
     public static final int RC_SIGN_IN = 42;
+    public static final int RC_CALENDAR_PERMISSIONS = 412;
     GoogleSignInClient mGoogleSignInClient;
-    Button btnSignIn;
+
+    // Save app user info for retrieving partner email
+    ParseUser user;
+    ParseUser pairPartner;
+    String pairEmail;
 
     //views
+    Button btnSignIn;
     Button mSignOut;
-    TextView mGivenName;
-    TextView mFamilyName;
     TextView mFullName;
     ImageView mProfileView;
     FloatingActionButton fabAddEvent;
     ConstraintLayout clProfileView;
 
     // configure the recycler view
-    List<String> allEvents;
+    List<String[]> allEvents;
     RecyclerView rvEvents;
     EventsAdapter adapter;
 
@@ -120,8 +127,16 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnSignIn = view.findViewById(R.id.authorize);
 
+        // Fetch current user's partner email if needed, when creating event
+        try {
+            fetchPartnerInfo();
+        } catch (com.parse.ParseException e) {
+            e.printStackTrace();
+        }
+
+        // Configure the layout views
+        btnSignIn = view.findViewById(R.id.btnGoogleSignIn);
         mSignOut = view.findViewById(R.id.signOut);
         mFullName = view.findViewById(R.id.fullName);
         mProfileView = view.findViewById(R.id.profileImage);
@@ -129,6 +144,7 @@ public class CalendarFragment extends Fragment {
         fabAddEvent = view.findViewById(R.id.fabAddEvent);
         clProfileView = view.findViewById(R.id.clProfileView);
 
+        // Set up the event recycler view
         allEvents = new ArrayList<>();
         adapter = new EventsAdapter(getContext(), allEvents);
         rvEvents.setAdapter(adapter);
@@ -141,9 +157,9 @@ public class CalendarFragment extends Fragment {
                 .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/calendar"))
                 .build();
-
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
+        // Handle the sign in flow; UI updated if the user is correctly signed in
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,6 +169,18 @@ public class CalendarFragment extends Fragment {
 
         // Add spin animation on floating button when fragment is created
         animateFloatingActionButton();
+    }
+
+    // Fetch partner info and partner email (if it exists)
+    private void fetchPartnerInfo() throws com.parse.ParseException {
+        user = ParseUser.getCurrentUser();
+        user.fetchIfNeeded();
+        pairPartner = (ParseUser) user.get(ChatFragment.CHAT_PAIR_KEY);
+        pairPartner.fetch();
+        if (pairPartner != null) {
+            pairEmail = (String) pairPartner.get(PUBLIC_EMAIL_KEY);
+        }
+        Log.i(TAG, "name: " + pairPartner.getUsername() + "\nemail: " + pairEmail);
     }
 
     private void animateFloatingActionButton() {
@@ -201,7 +229,7 @@ public class CalendarFragment extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void checkCalendars(boolean addingEvent) {
+    private void checkCalendars() {
         // Run query
         Cursor cur = null;
         ContentResolver cr = getContext().getContentResolver();
@@ -228,18 +256,14 @@ public class CalendarFragment extends Fragment {
             accountName = cur.getString(PROJECTION_ACCOUNT_NAME_INDEX);
             ownerName = cur.getString(PROJECTION_OWNER_ACCOUNT_INDEX);
 
-            // if button clicked to add event, call addEvent
-            if (addingEvent) {
-                addEvent(calID);
-            } else {
-                // check events here
-                checkEvents(calID);
-            }
+            checkEvents(calID);
+            calendarId = calID;
         }
     }
 
     private void checkEvents(long calID) {
         Uri.Builder builder = Uri.parse("content://com.android.calendar/instances/when").buildUpon();
+
         long now = new Date().getTime();
 
         ContentUris.appendId(builder, now - DateUtils.DAY_IN_MILLIS * 10000);
@@ -253,8 +277,8 @@ public class CalendarFragment extends Fragment {
 
         System.out.println("eventCursor count=" + eventCursor.getCount());
         if (eventCursor.getCount() > 0) {
-            allEvents.clear();
             if (eventCursor.moveToFirst()) {
+                allEvents.clear();
                 do {
                     final String title = eventCursor.getString(0);
                     final Date begin = new Date(eventCursor.getLong(1));
@@ -267,8 +291,9 @@ public class CalendarFragment extends Fragment {
                         String beginRelativeTime = getRelativeTimeAgo(begin.toString());
                         String endRelativeTime = getRelativeTimeAgo(end.toString());
                         // Add the event info to the adapter
-                        allEvents.add("Title: " + title + "\n" + beginRelativeTime);
+                        allEvents.add(new String[]{title, beginRelativeTime});
                         adapter.notifyDataSetChanged();
+                        Log.i(TAG, "Event title: " + title);
                     }
                 }
                 while (eventCursor.moveToNext());
@@ -294,10 +319,9 @@ public class CalendarFragment extends Fragment {
         return relativeDate;
     }
 
-
     // Method for adding and saving an event to calendar
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void addEvent(long calID) {
+    private void addEvent(long calID, String title, String description) {
         long startMillis = 0;
         long endMillis = 0;
         Calendar beginTime = null;
@@ -315,10 +339,13 @@ public class CalendarFragment extends Fragment {
         ContentValues values = new ContentValues();
         values.put(CalendarContract.Events.DTSTART, startMillis);
         values.put(CalendarContract.Events.DTEND, endMillis);
-        values.put(CalendarContract.Events.TITLE, "The fallout pt 2.5");
-        values.put(CalendarContract.Events.DESCRIPTION, "Group workout");
+        values.put(CalendarContract.Events.TITLE, title);
+        if (description != null) {
+            values.put(CalendarContract.Events.DESCRIPTION, description);
+        }
         values.put(CalendarContract.Events.CALENDAR_ID, calID);
-        values.put(CalendarContract.Events.EVENT_TIMEZONE, "America/Los_Angeles");
+        // Set event time zone to system time zone
+        values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().toString());
         Uri uriEvent = crEvent.insert(CalendarContract.Events.CONTENT_URI, values);
 
         // get the event ID that is the last element in the Uri
@@ -331,14 +358,24 @@ public class CalendarFragment extends Fragment {
     private void addAttendee(long eventID) {
         ContentResolver crAttendee = getContext().getContentResolver();
         ContentValues values = new ContentValues();
-        values.put(CalendarContract.Attendees.ATTENDEE_EMAIL, "example123@email.com");
-        values.put(CalendarContract.Attendees.EVENT_ID, eventID);
-        Uri uriAttendee = crAttendee.insert(CalendarContract.Attendees.CONTENT_URI, values);
+        if (pairPartner == null) {
+            Snackbar.make(getView(), "Event created, no invites sent", Snackbar.LENGTH_SHORT).
+                    setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
+        }
+        else if (pairEmail == null){
+            Snackbar.make(getView(), "Event created, partner does not have email invite", Snackbar.LENGTH_SHORT).
+                    setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
+        }
+        // If partner has valid email, add their email as an attendee
+        else {
+            values.put(CalendarContract.Attendees.ATTENDEE_EMAIL, pairEmail);
+            values.put(CalendarContract.Attendees.EVENT_ID, eventID);
+            crAttendee.insert(CalendarContract.Attendees.CONTENT_URI, values);
+            Snackbar.make(getView(), "Event created", Snackbar.LENGTH_SHORT).
+                    setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
 
-        String something = uriAttendee.getLastPathSegment();
-        Log.i(TAG, something + " attendee invited");
+        }
     }
-
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -387,27 +424,25 @@ public class CalendarFragment extends Fragment {
 
             fabAddEvent.setVisibility(View.VISIBLE);
             clProfileView.setVisibility(View.VISIBLE);
-            String displayName = account.getDisplayName();
+            String displayName = account.getGivenName();
             Uri imageUrl = account.getPhotoUrl();
 
-            if (displayName != null) mFullName.setText(displayName);
+            if (displayName != null) mFullName.setText(displayName + "'s Calendar");
             if (imageUrl != null) Glide.with(getContext())
                     .load(imageUrl).placeholder(R.drawable.ic_baseline_person_24).into(mProfileView);
 
-            Log.i(TAG, "name: " + displayName);
-
             emailUsername = account.getEmail();
             // First run a check to see if calendar permissions have already been granted
-            checkPermission(callbackId, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
+            checkPermission(RC_CALENDAR_PERMISSIONS, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
             // Try to access calendars only if permission granted
             if (permissionsGranted) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    checkCalendars(false);
+                    checkCalendars();
                 }
             }
             // If no calendar access, ask for user input again
             else {
-                checkPermission(callbackId, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
+                checkPermission(RC_CALENDAR_PERMISSIONS, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
             }
 
             // Configure add event button
@@ -415,9 +450,7 @@ public class CalendarFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        // TODO: add dialog popup for user to enter event info
-                        checkCalendars(true);
-                        refreshFragment();
+                        showAddEventDialog();
                     }
                 }
             });
@@ -441,6 +474,23 @@ public class CalendarFragment extends Fragment {
                 });
             }
         }
+    }
+
+    // Show a dialog to request user input on new event
+    private void showAddEventDialog() {
+        FragmentManager fm = getParentFragmentManager();
+        AddEventDialogFragment addEventDialogFragment = AddEventDialogFragment.newInstance();
+        // Set the calendar fragment for use later when sending event back
+        addEventDialogFragment.setTargetFragment(CalendarFragment.this, 300);
+        addEventDialogFragment.show(fm, "fragment_add_event");
+    }
+
+    @Override
+    public void onFinishAddEventDialog(String title, String description) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            addEvent(calendarId, title, description);
+        }
+        refreshFragment();
     }
 
     // Method to refresh the fragment view when an action has been performed
