@@ -81,6 +81,31 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
             }
         });
 
+        animateToDoActionButton();
+    }
+
+    // Spinning animation when To Do fragment is created
+    private void animateToDoActionButton() {
+        btnAdd.animate()
+                .rotationBy(180)
+                .setDuration(100)
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnAdd.setImageResource(R.drawable.ic_baseline_post_add_24);   // setting other icon
+                        //Shrink Animation
+                        btnAdd.animate()
+                                .rotationBy(180)   //Complete the rest of the rotation
+                                .setDuration(100)
+                                .scaleX(1)              //Scaling back to what it was
+                                .scaleY(1)
+                                .start();
+
+                    }
+                })
+                .start();
     }
 
     // Query To Do items from Parse where current user is included

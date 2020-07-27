@@ -135,6 +135,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
                 ivPairProfileImage.setImageResource(R.drawable.ic_baseline_person_24);
             }
 
+            btnDeletePairPartner.setVisibility(View.GONE);
             btnDeletePairPartner.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -402,7 +403,6 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
     }
 
     // Method for deleting a pairing relationship
-    // TODO: add confirmation dialog popup before deleting
     private void deletePairing() {
         user.remove(ChatFragment.CHAT_PAIR_KEY);
         user.put(IS_PAIRED_KEY, false);

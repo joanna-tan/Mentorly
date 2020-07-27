@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder> {
-    private List<String> events;
+    private List<String[]> events;
     private Context context;
 
-    public EventsAdapter(Context context, List<String> events) {
+    public EventsAdapter(Context context, List<String[]> events) {
         this.events = events;
         this.context = context;
     }
@@ -24,17 +24,15 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     @NonNull
     @Override
     public EventsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View contactView = inflater.inflate(R.layout.item_event, parent, false);
+        View view = inflater.inflate(R.layout.item_event, parent, false);
 
-        return new ViewHolder(contactView);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String event = events.get(position);
-        //if the message fromId == userId, message is sent by the current user
+        String[] event = events.get(position);
         holder.bind(event);
     }
 
@@ -46,16 +44,21 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView icon;
         TextView tvDetails;
+        TextView tvTitleEvent;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvDetails = itemView.findViewById(R.id.text1);
+            tvTitleEvent = itemView.findViewById(R.id.titleEvent);
             icon = itemView.findViewById(R.id.icon);
         }
 
-        public void bind(String event) {
-            tvDetails.append(event);
-            icon.setImageResource(R.drawable.ic_baseline_person_24);
+        public void bind(String[] event) {
+            if (event.length >= 2) {
+                tvTitleEvent.setText(event[0]);
+                tvDetails.setText(event[1]);
+            }
+            icon.setImageResource(R.drawable.ic_outline_calendar_today_24);
         }
     }
 }

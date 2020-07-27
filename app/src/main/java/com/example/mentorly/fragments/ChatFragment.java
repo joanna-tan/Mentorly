@@ -1,6 +1,7 @@
 package com.example.mentorly.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.parse.livequery.ParseLiveQueryClient;
+import com.parse.livequery.SubscriptionHandling;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,7 @@ public class ChatFragment extends Fragment {
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
     public static final String CHAT_PAIR_KEY = "pairID";
     public static final String USERNAME_KEY = "username";
+    public static final String USER_ID_KEY = "objectId";
 
     List<Message> allMessages;
     ChatAdapter adapter;
@@ -49,6 +53,17 @@ public class ChatFragment extends Fragment {
 
     // Keep track of initial load to scroll to the bottom of the ListView
     boolean mFirstLoad;
+
+    // Create a handler which can run refresh messages periodically
+    static final int POLL_INTERVAL = 1000; // milliseconds
+    Handler myHandler = new android.os.Handler();
+    Runnable mRefreshMessagesRunnable = new Runnable() {
+        @Override
+        public void run() {
+            refreshMessages();
+            myHandler.postDelayed(this, POLL_INTERVAL);
+        }
+    };
 
     public ChatFragment() {
         // Required empty public constructor
@@ -78,6 +93,34 @@ public class ChatFragment extends Fragment {
         if (pairPartner != null) {
             setupMessagePosting(view);
             tvNoPair.setVisibility(View.GONE);
+            // Make sure the Parse server is setup to configured for live queries
+            ParseLiveQueryClient parseLiveQueryClient = ParseLiveQueryClient.Factory.getClient();
+
+            ParseQuery<Message> parseQuery = ParseQuery.getQuery(Message.class);
+            // Check to only receive messages from user's pairPartner
+            parseQuery.whereEqualTo(Message.FROM_ID_KEY, pairPartner);
+            parseQuery.whereEqualTo(Message.TO_ID_KEY, ParseUser.getCurrentUser());
+
+            // Connect to Parse server
+            SubscriptionHandling<Message> subscriptionHandling = parseLiveQueryClient.subscribe(parseQuery);
+
+            // Listen for CREATE events
+            subscriptionHandling.handleEvent(SubscriptionHandling.Event.CREATE, new
+                    SubscriptionHandling.HandleEventCallback<Message>() {
+                        @Override
+                        public void onEvent(ParseQuery<Message> query, Message object) {
+                            allMessages.add(0, object);
+
+                            // RecyclerView updates need to be run on the UI thread
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.notifyDataSetChanged();
+                                    rvChat.scrollToPosition(0);
+                                }
+                            });
+                        }
+                    });
         } else {
             RelativeLayout chatLayout = view.findViewById(R.id.rlChatLayout);
             chatLayout.setVisibility(View.GONE);
@@ -121,7 +164,6 @@ public class ChatFragment extends Fragment {
                 message.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
-                        Toast.makeText(getContext(), "Successfully created message on Parse", Toast.LENGTH_SHORT).show();
                         refreshMessages();
                     }
                 });
@@ -183,8 +225,7 @@ public class ChatFragment extends Fragment {
                 mentor.fetch();
                 pairId = pairPartner.getObjectId();
                 pairUsername = pairPartner.getUsername();
-            }
-            else {
+            } else {
                 Log.i(TAG, "No mentor found for " + user.getUsername());
             }
 

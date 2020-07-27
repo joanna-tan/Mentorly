@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.mentorly.models.Message;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -70,6 +71,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         //retrieve the user from the message (aka from ID)
         ParseUser user = message.getFromId();
+
+        try {
+            user.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         //set the profileView image to user.getImage()
         ParseFile profileImage = user.getParseFile(PROFILE_IMAGE_KEY);
