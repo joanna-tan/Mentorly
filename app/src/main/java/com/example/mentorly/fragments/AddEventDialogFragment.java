@@ -2,11 +2,15 @@ package com.example.mentorly.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.format.DateFormat;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,8 +72,6 @@ public class AddEventDialogFragment extends DialogFragment {
         etEventTitle.requestFocus();
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-
-        // TODO: add error checking for choosing an end time before the start time
 
         // set start time picker
         etTimePick.setInputType(InputType.TYPE_NULL);
@@ -165,6 +167,17 @@ public class AddEventDialogFragment extends DialogFragment {
                 }
                 else if (etEndTimePick.getText().toString().isEmpty()){
                     Toast.makeText(getContext(), "Please enter an end time", Toast.LENGTH_SHORT).show();
+                }
+                // if the start hour is greater than end hour
+                else if (startSelected[3] > endSelected [3] ||
+                        startSelected[3] ==  endSelected [3] && startSelected[4] > endSelected [4]) {
+                    Toast.makeText(getContext(), "Please select a valid end time", Toast.LENGTH_SHORT).show();
+
+                    // Set the color of the end time to RED to indicate error
+                    String endTime = etEndTimePick.getText().toString();
+                    Spannable WordtoSpan = new SpannableString(endTime);
+                    WordtoSpan.setSpan(new ForegroundColorSpan(Color.RED),0, endTime.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    etEndTimePick.setText(WordtoSpan);
                 }
                 else {
                     sendBackResult();

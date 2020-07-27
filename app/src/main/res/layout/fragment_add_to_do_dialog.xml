@@ -14,7 +14,7 @@
         android:id="@+id/etToDoTitle"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:hint="Title"
+        android:hint="ToDo Title"
         android:imeOptions="actionDone"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@id/etToDoBody"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_marginTop="8dp"
-        android:text="Submit"
+        android:text="Add Item"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etToDoBody" />
 </androidx.constraintlayout.widget.ConstraintLayout>
