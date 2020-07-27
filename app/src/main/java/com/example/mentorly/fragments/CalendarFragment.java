@@ -321,17 +321,17 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     // Method for adding and saving an event to calendar
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void addEvent(long calID, String title, String description) {
+    private void addEvent(long calID, String title, String description, int[] startSelected, int[] endSelected) {
         long startMillis = 0;
         long endMillis = 0;
         Calendar beginTime = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             beginTime = Calendar.getInstance();
         }
-        beginTime.set(2020, 7, 24, 7, 30);
+        beginTime.set(startSelected[0], startSelected[1], startSelected[2], startSelected[3], startSelected[4]);
         startMillis = beginTime.getTimeInMillis();
         Calendar endTime = Calendar.getInstance();
-        endTime.set(2020, 7, 24, 8, 45);
+        endTime.set(endSelected[0], endSelected[1], endSelected[2], endSelected[3], endSelected[4]);
         endMillis = endTime.getTimeInMillis();
 
 
@@ -486,9 +486,9 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     }
 
     @Override
-    public void onFinishAddEventDialog(String title, String description) {
+    public void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            addEvent(calendarId, title, description);
+            addEvent(calendarId, title, description, startSelected, endSelected);
         }
         refreshFragment();
     }
