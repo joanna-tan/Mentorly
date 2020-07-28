@@ -3,6 +3,7 @@ package com.example.mentorly.models;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
+import java.util.Date;
 import java.util.List;
 
 @ParseClassName("ToDoItem")
@@ -10,6 +11,7 @@ public class ToDoItem extends ParseObject {
     public static final String TITLE_KEY = "title";
     public static final String BODY_KEY = "body";
     public static final String USERS_KEY = "users";
+    public static final String DUE_DATE_KEY = "dueDate";
 
     public String getTitle() {
         return getString(TITLE_KEY);
@@ -17,6 +19,10 @@ public class ToDoItem extends ParseObject {
 
     public String getBody() {
         return getString(BODY_KEY);
+    }
+
+    public Date getDueDate() {
+        return getDate(DUE_DATE_KEY);
     }
 
     public List getUsers() {
@@ -33,5 +39,9 @@ public class ToDoItem extends ParseObject {
 
     public void setUsers(List users) {
         put(USERS_KEY, users);
+    }
+
+    public void setDueDate(Date dueDate) {
+        put(DUE_DATE_KEY, dueDate);
     }
 }

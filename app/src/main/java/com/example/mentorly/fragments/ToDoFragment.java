@@ -29,6 +29,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddToDoDialogListener {
@@ -129,6 +130,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
         ParseQuery<ToDoItem> query = ParseQuery.getQuery(ToDoItem.class);
 
         query.whereEqualTo(ToDoItem.USERS_KEY, ParseUser.getCurrentUser());
+        query.orderByAscending(ToDoItem.DUE_DATE_KEY);
 
         query.findInBackground(new FindCallback<ToDoItem>() {
             @Override
@@ -147,20 +149,22 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
 
     private void showAlertDialog() {
         FragmentManager fm = getParentFragmentManager();
-        AddToDoDialogFragment editNameDialogFragment = AddToDoDialogFragment.newInstance("Enter mentor name");
-        // SETS the target fragment for use later when sending results
-        editNameDialogFragment.setTargetFragment(ToDoFragment.this, 300);
-        editNameDialogFragment.show(fm, "fragment_edit_name");
+        AddToDoDialogFragment addToDoDialog = AddToDoDialogFragment.newInstance("Enter mentor name");
+        // Sets the to do fragment for use when dialog is finished
+        addToDoDialog.setTargetFragment(ToDoFragment.this, 300);
+        addToDoDialog.show(fm, "fragment_edit_name");
     }
 
     @Override
-    public void onFinishEditDialog(String title, String body) {
+    public void onFinishEditDialog(String title, String body, Date dueDate) {
         // Create a new To Do item and saveInBackground to ParseServer
         ToDoItem newItem = new ToDoItem();
         newItem.setTitle(title);
         if (body != null && !body.equals("")) {
             newItem.setBody(body);
         }
+
+        newItem.setDueDate(dueDate);
 
         List<ParseUser> users = new ArrayList<>();
         users.add(currentUser);

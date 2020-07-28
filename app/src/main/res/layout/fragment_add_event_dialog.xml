@@ -64,14 +64,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/etSelectDate" />
 
-<!--        <com.google.android.material.textfield.TextInputLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            android:id="@+id/inputEndTime"-->
-<!--            app:layout_constraintStart_toEndOf="@id/etSelectTime"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/etSelectDate">-->
-
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSelectEndTime"
                 android:layout_width="wrap_content"
@@ -85,8 +77,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/etSelectTime"
                 app:layout_constraintTop_toBottomOf="@+id/etSelectDate" />
-
-<!--        </com.google.android.material.textfield.TextInputLayout>-->
 
         <Button
             android:id="@+id/btnSubmitEvent"

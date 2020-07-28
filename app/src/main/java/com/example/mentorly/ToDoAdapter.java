@@ -1,6 +1,7 @@
 package com.example.mentorly;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mentorly.models.ToDoItem;
 
+import java.util.Date;
 import java.util.List;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
@@ -51,6 +53,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         // for any view that will be set as you render a row
         TextView tvTitle;
         TextView tvBody;
+        TextView tvDueDate;
 
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
@@ -61,14 +64,24 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvBody = itemView.findViewById(R.id.tvDescription);
+            tvDueDate = itemView.findViewById(R.id.tvDueDate);
         }
 
         public void bind(ToDoItem item) {
             String title = item.getTitle();
             String body = item.getBody();
+            Date dueDate = item.getDueDate();
 
             tvTitle.setText(title);
 
+            // retrieve due date format from Date
+            if (dueDate != null && dueDate.toString() != null) {
+                String day          = (String) DateFormat.format("dd",   dueDate); // 20
+                String monthNumber  = (String) DateFormat.format("MM",   dueDate); // 06
+                String year         = (String) DateFormat.format("yyyy", dueDate); // 2013
+                String dueString = monthNumber + "/" + day + "/" + year;
+                tvDueDate.setText("Due: " + dueString);
+            }
             // Check if the optional description has an input, else remove the view
             if (body != null && !body.equals("")) {
                 tvBody.setText(body);

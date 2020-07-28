@@ -1,25 +1,35 @@
 package com.example.mentorly.fragments;
 
+import android.app.DatePickerDialog;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.mentorly.R;
+
+import java.util.Date;
 
 
 public class AddToDoDialogFragment extends DialogFragment {
 
     private EditText etToDoTitle;
     private EditText etToDoBody;
+    private EditText etToDoDatePick;
     private Button btnSubmit;
+    private Date dueDate;
 
     public AddToDoDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -28,9 +38,6 @@ public class AddToDoDialogFragment extends DialogFragment {
 
     public static AddToDoDialogFragment newInstance(String title) {
         AddToDoDialogFragment frag = new AddToDoDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("title", title);
-        frag.setArguments(args);
         return frag;
     }
 
@@ -46,11 +53,9 @@ public class AddToDoDialogFragment extends DialogFragment {
         // Get field from view
         etToDoTitle = view.findViewById(R.id.etToDoTitle);
         etToDoBody = view.findViewById(R.id.etToDoBody);
+        etToDoDatePick = view.findViewById(R.id.etToDoDate);
         btnSubmit = view.findViewById(R.id.btnSubmit);
 
-        // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", "Enter Name");
-        getDialog().setTitle(title);
         // Show soft keyboard automatically and request focus to field
         etToDoTitle.requestFocus();
         getDialog().getWindow().setSoftInputMode(
@@ -61,7 +66,10 @@ public class AddToDoDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 if (etToDoTitle.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Title cannot be empty!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "ToDo title cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+                else if (etToDoDatePick.getText().toString().isEmpty()) {
+                    Toast.makeText(getContext(), "Please select a due date", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     sendBackResult();
@@ -69,25 +77,46 @@ public class AddToDoDialogFragment extends DialogFragment {
                 }
             }
         });
+
+        etToDoDatePick.setInputType(InputType.TYPE_NULL);
+        etToDoDatePick.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View view) {
+                final Calendar cldr = Calendar.getInstance();
+                int day = cldr.get(Calendar.DAY_OF_MONTH);
+                int month = cldr.get(Calendar.MONTH);
+                int year = cldr.get(Calendar.YEAR);
+                // date picker dialog
+                DatePickerDialog picker = new DatePickerDialog(getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.set(year, monthOfYear, dayOfMonth);
+                                dueDate = calendar.getTime();
+
+                                etToDoDatePick.setText((monthOfYear + 1) + "/" + dayOfMonth + "/" + year);
+                            }
+                        }, year, month, day);
+                picker.show();
+            }
+        });
     }
 
     // Defines the listener interface
     public interface AddToDoDialogListener {
-        void onFinishEditDialog(String title, String body);
+        void onFinishEditDialog(String title, String body, Date date);
     }
 
-    // Call this method to send the data back to the parent fragment
+    // Call this method to send To Do info back to the parent fragment
     public void sendBackResult() {
-        // Notice the use of `getTargetFragment` which will be set when the dialog is displayed
         AddToDoDialogListener listener = (AddToDoDialogListener) getTargetFragment();
         if (etToDoBody.getText().toString().isEmpty()) {
-            listener.onFinishEditDialog(etToDoTitle.getText().toString(), null);
-        }
-        else {
-            listener.onFinishEditDialog(etToDoTitle.getText().toString(), etToDoBody.getText().toString());
+            listener.onFinishEditDialog(etToDoTitle.getText().toString(), null, dueDate);
+        } else {
+            listener.onFinishEditDialog(etToDoTitle.getText().toString(), etToDoBody.getText().toString(), dueDate);
         }
         dismiss();
     }
-
-
 }

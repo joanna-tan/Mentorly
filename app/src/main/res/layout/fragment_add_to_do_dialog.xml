@@ -32,9 +32,20 @@
         android:inputType="text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etToDoTitle"
-        app:layout_constraintBottom_toTopOf="@id/btnSubmit"
         android:background="@android:drawable/editbox_background_normal"
         />
+
+    <EditText
+        android:id="@+id/etToDoDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/editbox_background_normal"
+        android:focusableInTouchMode="false"
+        android:hint="Select date"
+        android:paddingTop="8dp"
+        app:layout_constraintBottom_toTopOf="@id/btnSubmit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etToDoBody" />
 
     <Button
         android:id="@+id/btnSubmit"
@@ -44,5 +55,5 @@
         android:layout_marginTop="8dp"
         android:text="Add Item"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etToDoBody" />
+        app:layout_constraintTop_toBottomOf="@id/etToDoDate" />
 </androidx.constraintlayout.widget.ConstraintLayout>
