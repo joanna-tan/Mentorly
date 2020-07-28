@@ -43,12 +43,12 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView icon;
-        TextView tvDetails;
+        TextView tvEventStart;
         TextView tvTitleEvent;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvDetails = itemView.findViewById(R.id.text1);
+            tvEventStart = itemView.findViewById(R.id.tvEventStart);
             tvTitleEvent = itemView.findViewById(R.id.titleEvent);
             icon = itemView.findViewById(R.id.icon);
         }
@@ -56,7 +56,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
         public void bind(String[] event) {
             if (event.length >= 2) {
                 tvTitleEvent.setText(event[0]);
-                tvDetails.setText(event[1]);
+                tvEventStart.setText(event[1]);
             }
             icon.setImageResource(R.drawable.ic_outline_calendar_today_24);
         }

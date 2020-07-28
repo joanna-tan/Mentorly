@@ -2,7 +2,6 @@ package com.example.mentorly.fragments;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +22,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -128,6 +129,12 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar_main);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        // Get access to the custom title view
+        TextView mTitle = toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("Calendar");
         // Fetch current user's partner email if needed, when creating event
         try {
             fetchPartnerInfo();
@@ -262,27 +269,29 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     }
 
     private void checkEvents(long calID) {
-        Uri.Builder builder = Uri.parse("content://com.android.calendar/instances/when").buildUpon();
+        Cursor cur = null;
+        ContentResolver cr = getContext().getContentResolver();
+        Uri uri = CalendarContract.Events.CONTENT_URI;
 
-        long now = new Date().getTime();
+        // array for values to store from the event
+        String[] EVENT_PROJECTION = new String[]{
+                CalendarContract.Events._ID,                    // 0
+                CalendarContract.Events.DTSTART,                // 1
+                CalendarContract.Events.DTEND,                  // 2
+                CalendarContract.Events.TITLE,                  // 3
+                CalendarContract.Events.DESCRIPTION             // 4
+        };
+        cur = cr.query(uri, EVENT_PROJECTION, "CALENDAR_ID=" + calID, null, "dtstart ASC, dtend ASC");
 
-        ContentUris.appendId(builder, now - DateUtils.DAY_IN_MILLIS * 10000);
-        ContentUris.appendId(builder, now + DateUtils.DAY_IN_MILLIS * 10000);
-
-        ContentResolver contentResolver = getContext().getContentResolver();
-
-        Cursor eventCursor = contentResolver.query(builder.build(),
-                new String[]{"title", "begin", "end", "allDay"}, "CALENDAR_ID=" + calID,
-                null, "startDay ASC, startMinute ASC");
-
-        System.out.println("eventCursor count=" + eventCursor.getCount());
-        if (eventCursor.getCount() > 0) {
-            if (eventCursor.moveToFirst()) {
+        System.out.println("eventCursor count=" + cur.getCount());
+        if (cur.getCount() > 0) {
+            if (cur.moveToFirst()) {
                 allEvents.clear();
                 do {
-                    final String title = eventCursor.getString(0);
-                    final Date begin = new Date(eventCursor.getLong(1));
-                    final Date end = new Date(eventCursor.getLong(2));
+                    final Date begin = new Date(cur.getLong(1));
+                    final Date end = new Date(cur.getLong(2));
+                    final String title = cur.getString(3);
+                    final String description = cur.getString(4);
 
                     Date currentTime = new Date(System.currentTimeMillis());
 
@@ -290,13 +299,17 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                     if (end.after(currentTime)) {
                         String beginRelativeTime = getRelativeTimeAgo(begin.toString());
                         String endRelativeTime = getRelativeTimeAgo(end.toString());
+
                         // Add the event info to the adapter
                         allEvents.add(new String[]{title, beginRelativeTime});
                         adapter.notifyDataSetChanged();
                         Log.i(TAG, "Event title: " + title);
+                        Log.i(TAG, "Description: " + description);
+                        Log.i(TAG, "Event start: " + begin);
+                        Log.i(TAG, "Event end: " + end);
                     }
                 }
-                while (eventCursor.moveToNext());
+                while (cur.moveToNext());
             }
         }
     }
@@ -424,10 +437,10 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
             fabAddEvent.setVisibility(View.VISIBLE);
             clProfileView.setVisibility(View.VISIBLE);
-            String displayName = account.getGivenName();
+            String displayName = account.getDisplayName();
             Uri imageUrl = account.getPhotoUrl();
 
-            if (displayName != null) mFullName.setText(displayName + "'s Calendar");
+            if (displayName != null) mFullName.setText(displayName);
             if (imageUrl != null) Glide.with(getContext())
                     .load(imageUrl).placeholder(R.drawable.ic_baseline_person_24).into(mProfileView);
 
