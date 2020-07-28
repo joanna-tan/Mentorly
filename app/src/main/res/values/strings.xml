@@ -37,4 +37,8 @@
 <!--    API calls-->
     <string name="request_complete">API Call Successful.</string>
     <string name="request_failed">API Call Failed.</string>
+
+<!--    Hamburger icon-->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>

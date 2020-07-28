@@ -6,9 +6,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -57,13 +60,25 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Set the toolbar text & remove default text
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar_main);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().show();
+        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        // Get access to the custom title view
+        TextView mTitle = toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("Objectives");
+
+
+        // Retrieve user info
         currentUser = ParseUser.getCurrentUser();
         findPartnerId();
 
+        // Set up the views for to-do list
         items = new ArrayList<>();
         rvItems = view.findViewById(R.id.rvItems);
         btnAdd = view.findViewById(R.id.btnAddToDo);
-
 
         // Set up the To Do item adapter
         adapter = new ToDoAdapter(getContext(), items);
@@ -71,6 +86,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
         rvItems.setLayoutManager(linearLayoutManager);
         rvItems.setAdapter(adapter);
 
+        // Query To Do items for the current user
         refreshToDoItems();
 
         // set onClick listener on add button, bring up dialog to check for adding a to do item

@@ -29,12 +29,12 @@
         android:fontFamily="sans-serif-black"
         android:paddingStart="?android:attr/listPreferredItemPaddingStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintBottom_toTopOf="@id/text1"
+        app:layout_constraintBottom_toTopOf="@id/tvEventStart"
         app:layout_constraintStart_toEndOf="@id/icon"
         tools:text="Title" />
 
     <TextView
-        android:id="@+id/text1"
+        android:id="@+id/tvEventStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
