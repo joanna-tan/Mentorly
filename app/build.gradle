@@ -80,4 +80,7 @@ dependencies {
     implementation 'com.google.apis:google-api-services-calendar:v3-rev20200610-1.30.10'
 
     implementation 'com.github.parse-community:ParseLiveQuery-Android:1.2.2' // for Parse Live Queries
+
+    implementation 'org.parceler:parceler-api:1.1.12'
+    annotationProcessor 'org.parceler:parceler:1.1.12'
 }

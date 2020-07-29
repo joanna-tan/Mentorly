@@ -86,7 +86,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     public static final String TAG = "CalendarFragment";
     public static final String PUBLIC_EMAIL_KEY = "publicEmail";
-    public static final int RC_SIGN_IN = 42;
+    public static final int RC_SIGN_IN = 429;
     public static final int RC_CALENDAR_PERMISSIONS = 412;
     GoogleSignInClient mGoogleSignInClient;
 
@@ -157,10 +157,9 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         rvEvents.setAdapter(adapter);
         rvEvents.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+//         Configure sign-in to request the user's ID, email address, and basic
+//         profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.client_id_web))
                 .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/calendar"))
                 .build();
@@ -392,7 +391,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        getActivity().startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
@@ -404,20 +403,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         updateUI(account);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+    public void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             // Signed in successfully, show authenticated UI.
@@ -441,7 +427,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             Uri imageUrl = account.getPhotoUrl();
 
             if (displayName != null) mFullName.setText(displayName);
-            if (imageUrl != null) Glide.with(getContext())
+            Glide.with(getContext())
                     .load(imageUrl).placeholder(R.drawable.ic_baseline_person_24).into(mProfileView);
 
             emailUsername = account.getEmail();

@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        ConstraintLayout clEvent;
         ImageView icon;
         TextView tvEventStart;
         TextView tvTitleEvent;
@@ -51,9 +53,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
             tvEventStart = itemView.findViewById(R.id.tvEventStart);
             tvTitleEvent = itemView.findViewById(R.id.titleEvent);
             icon = itemView.findViewById(R.id.icon);
+            clEvent = itemView.findViewById(R.id.clEventLayout);
         }
 
-        public void bind(String[] event) {
+        public void bind(final String[] event) {
             if (event.length >= 2) {
                 tvTitleEvent.setText(event[0]);
                 tvEventStart.setText(event[1]);

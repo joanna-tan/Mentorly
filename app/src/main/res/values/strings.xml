@@ -1,5 +1,5 @@
 <resources>
-<!--    User sign in/registration resources-->
+    <!--    User sign in/registration resources-->
     <string name="app_name">Mentorly</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
@@ -20,7 +20,7 @@
     <string name="register_your_account">Register your account</string>
     <string name="password_cap">Password</string>
 
-<!--    Profile resources-->
+    <!--    Profile resources-->
     <string name="profile_me">My Profile Pic</string>
     <string name="profile_other">Other profile pic</string>
     <string name="message_hint">Say anything</string>
@@ -32,11 +32,11 @@
     <string name="intent_host">cprest</string>
     <string name="intent_scheme">oauth</string>
 
-<!--    API calls-->
+    <!--    API calls-->
     <string name="request_complete">API Call Successful.</string>
     <string name="request_failed">API Call Failed.</string>
 
-<!--    Hamburger icon-->
+    <!--    Hamburger icon-->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="no_todo_view">Your To Do list is empty! Tap the button below to add more items.</string>

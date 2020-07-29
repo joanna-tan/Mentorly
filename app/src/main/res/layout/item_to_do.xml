@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardViewToDo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="3dp"
@@ -33,22 +34,39 @@
             android:id="@+id/tvDueDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:fontFamily="@font/oxygen"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvTitle"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
             tools:text="Due 07/29/20"
             />
 
-        <TextView
-            android:id="@+id/tvDescription"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:id="@+id/rlToDoDetails"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
-            tools:text="@tools:sample/lorem[50]" />
+            app:layout_constraintTop_toBottomOf="@+id/tvDueDate">
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                tools:text="@tools:sample/lorem[50]" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/ivDropDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvTitle"
+            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
