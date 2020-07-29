@@ -1,5 +1,6 @@
 package com.example.mentorly.fragments;
 
+import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,9 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +25,7 @@ import com.example.mentorly.R;
 import com.example.mentorly.ToDoAdapter;
 import com.example.mentorly.models.ToDoItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -32,9 +36,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
 public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddToDoDialogListener {
 
     public static final String TAG = "ToDoFragment";
+    TextView tvNoToDos;
     List<ToDoItem> items;
     RecyclerView rvItems;
     FloatingActionButton btnAdd;
@@ -45,6 +52,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
     public ToDoFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +67,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // Set the toolbar text & remove default text
@@ -80,6 +88,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
         items = new ArrayList<>();
         rvItems = view.findViewById(R.id.rvItems);
         btnAdd = view.findViewById(R.id.btnAddToDo);
+        tvNoToDos = view.findViewById(R.id.tvNoToDoItems);
 
         // Set up the To Do item adapter
         adapter = new ToDoAdapter(getContext(), items);
@@ -99,7 +108,62 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
         });
 
         animateToDoActionButton();
+
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                final int itemPosition = viewHolder.getAdapterPosition();
+                ToDoItem item = items.get(itemPosition);
+
+                // Save the item in a new temp variable in case user restores item
+                final ToDoItem newItem = new ToDoItem();
+                newItem.setTitle(item.getTitle());
+                if (item.getBody() != null) {
+                    newItem.setBody(item.getBody());
+                }
+                newItem.setDueDate(item.getDueDate());
+                newItem.setUsers(item.getUsers());
+
+                // Delete the swiped item
+                item.deleteInBackground();
+                viewHolder.getAdapterPosition();
+                items.remove(viewHolder.getAdapterPosition());
+                adapter.notifyDataSetChanged();
+
+                // show a Snackbar for the user to un-delete the To Do item
+                Snackbar.make(getView(), "Deleted Saved Selection.", Snackbar.LENGTH_LONG).
+                        setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                newItem.saveInBackground();
+                                items.add(itemPosition, newItem);
+                                adapter.notifyDataSetChanged();
+                            }
+
+                        }).show();
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .addBackgroundColor(ContextCompat.getColor(getContext(), R.color.color_green_done))
+                        .addActionIcon(R.drawable.ic_baseline_check_24)
+                        .create()
+                        .decorate();
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(rvItems);
     }
+
 
     // Spinning animation when To Do fragment is created
     private void animateToDoActionButton() {
@@ -119,7 +183,6 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
                                 .scaleX(1)              //Scaling back to what it was
                                 .scaleY(1)
                                 .start();
-
                     }
                 })
                 .start();
@@ -138,9 +201,16 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
                 if (e == null) {
                     items.clear();
                     items.addAll(objects);
+
+                    // If items list is empty, show text view to add some items
+                    if (items.isEmpty()) {
+                        tvNoToDos.setVisibility(View.VISIBLE);
+                    } else {
+                        tvNoToDos.setVisibility(View.GONE);
+                    }
+
                     adapter.notifyDataSetChanged();
-                }
-                else {
+                } else {
                     Log.i(TAG, "Error retrieving ToDo items" + e);
                 }
             }

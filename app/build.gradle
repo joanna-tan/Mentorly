@@ -75,6 +75,8 @@ dependencies {
     implementation 'net.openid:appauth:0.2.0'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
 
+    implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.3'
+
     implementation 'com.google.apis:google-api-services-calendar:v3-rev20200610-1.30.10'
 
     implementation 'com.github.parse-community:ParseLiveQuery-Android:1.2.2' // for Parse Live Queries

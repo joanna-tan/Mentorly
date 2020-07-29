@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -17,6 +18,9 @@ import com.example.mentorly.fragments.CalendarFragment;
 import com.example.mentorly.fragments.ChatFragment;
 import com.example.mentorly.fragments.ProfileFragment;
 import com.example.mentorly.fragments.ToDoFragment;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.parse.ParseUser;
@@ -92,18 +96,54 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         selectDrawerItem(menuItem);
-                        return true;
+                        return false;
                     }
                 });
     }
 
+    // Create a new fragment and specify the fragment to show based on nav item clicked
     public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
-        if (menuItem.getItemId() == R.id.nav_third_fragment) {
-            ParseUser.logOut();
-            Intent i = new Intent(this, LoginActivity.class);
-            startActivity(i);
+        // Handle user logout
+        if (menuItem.getItemId() == R.id.nav_logout) {
+            userSignOut();
         }
+        else {
+            Fragment fragment = null;
+            switch (menuItem.getItemId()) {
+                case R.id.nav_logout:
+                    userSignOut();
+                    break;
+                default:
+                    Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+
+            if (fragment != null) {
+                // Insert the fragment by replacing any existing fragment
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+            }
+
+            // Highlight the selected item has been done by NavigationView
+            menuItem.setChecked(false);
+            // Set action bar title
+            setTitle(menuItem.getTitle());
+            // Close the navigation drawer
+            mDrawer.closeDrawers();
+        }
+    }
+
+    private void userSignOut() {
+        ParseUser.logOut();
+        // Log out the google user as well
+        GoogleSignInOptions gso = new GoogleSignInOptions.
+                Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).
+                build();
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient.signOut();
+
+        // Send user to loginActivity
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
     }
 
     private ActionBarDrawerToggle setupDrawerToggle() {

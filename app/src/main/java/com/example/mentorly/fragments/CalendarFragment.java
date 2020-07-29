@@ -183,11 +183,11 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         user = ParseUser.getCurrentUser();
         user.fetchIfNeeded();
         pairPartner = (ParseUser) user.get(ChatFragment.CHAT_PAIR_KEY);
-        pairPartner.fetch();
         if (pairPartner != null) {
+            pairPartner.fetchIfNeeded();
             pairEmail = (String) pairPartner.get(PUBLIC_EMAIL_KEY);
+            Log.i(TAG, "name: " + pairPartner.getUsername() + "\nemail: " + pairEmail);
         }
-        Log.i(TAG, "name: " + pairPartner.getUsername() + "\nemail: " + pairEmail);
     }
 
     private void animateFloatingActionButton() {
@@ -474,19 +474,23 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                 mSignOut.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mGoogleSignInClient.signOut()
-                                .addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        Snackbar snackbar = Snackbar.make(getView(), "Signed out", Snackbar.LENGTH_SHORT);
-                                        snackbar.setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
-                                        refreshFragment();
-                                    }
-                                });
+                        googleSignOut();
                     }
                 });
             }
         }
+    }
+
+    public void googleSignOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Snackbar snackbar = Snackbar.make(getView(), "Signed out", Snackbar.LENGTH_SHORT);
+                        snackbar.setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
+                        refreshFragment();
+                    }
+                });
     }
 
     // Show a dialog to request user input on new event

@@ -48,10 +48,10 @@
         android:layout_marginEnd="16dp"
         android:layout_weight="1"
         android:autofillHints="@string/password"
+        android:background="@android:drawable/editbox_background_normal"
         android:ems="10"
         android:hint="@string/password"
         android:inputType="textPassword"
-        android:background="@android:drawable/editbox_background_normal"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,5 +87,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnLogin" />
+
+    <TextView
+        android:id="@+id/tvPasswordReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:clickable="true"
+        android:text="Forgot your password?"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        android:textColor="@color/color_blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSignUp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

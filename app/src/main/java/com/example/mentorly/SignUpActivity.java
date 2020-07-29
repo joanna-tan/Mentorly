@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mentorly.fragments.CalendarFragment;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -17,8 +18,11 @@ import com.parse.SignUpCallback;
 public class SignUpActivity extends AppCompatActivity {
 
     public static final String TAG = "SignUpActivity";
+    public static final String FIRST_NAME_KEY = "firstName";
+    public static final String LAST_NAME_KEY = "lastName";
     private EditText etFirstName;
     private EditText etLastName;
+    private EditText etEmail;
     private EditText etUsername;
     private EditText etPassword;
     private EditText etPasswordConfirm;
@@ -31,11 +35,11 @@ public class SignUpActivity extends AppCompatActivity {
 
         etFirstName = findViewById(R.id.etFirstName);
         etLastName = findViewById(R.id.etLastName);
+        etEmail = findViewById(R.id.etEmail);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         etPasswordConfirm = findViewById(R.id.etPasswordConfirm);
         btnSignUp = findViewById(R.id.btnSignUp);
-
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,6 +48,9 @@ public class SignUpActivity extends AppCompatActivity {
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
                 String passwordConfirm = etPasswordConfirm.getText().toString();
+                String inputEmail = etEmail.getText().toString();
+                String firstName = etFirstName.getText().toString();
+                String lastName = etLastName.getText().toString();
 
                 //check if the two password fields are the same
                 if (!password.equals(passwordConfirm)) {
@@ -55,19 +62,35 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, "Username/password cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                signUpNewUser(username, password);
+                else {
+                    // Check if email is valid or not by searching chars
+                    if (!isEmailValid(inputEmail)){
+                        Toast.makeText(SignUpActivity.this, "Invalid email", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                // if all fields are correct, then sign up user
+                signUpNewUser(username, password, inputEmail, firstName, lastName);
             }
         });
     }
 
-    private void signUpNewUser(final String username, final String password) {
+    private boolean isEmailValid(CharSequence email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private void signUpNewUser(final String username, final String password, String email, String firstName, String lastName) {
         // Create the ParseUser
         ParseUser user = new ParseUser();
         // Set core properties
         user.setUsername(username);
         user.setPassword(password);
+        user.setEmail(email);
 
-        // TODO: save user first/last names in Parse
+        // Save the email in accessible field
+        user.put(CalendarFragment.PUBLIC_EMAIL_KEY, email);
+        user.put(FIRST_NAME_KEY, firstName);
+        user.put(LAST_NAME_KEY, lastName);
 
         // Invoke signUpInBackground
         user.signUpInBackground(new SignUpCallback() {
