@@ -30,7 +30,7 @@ Integrated platform for building and sustaining 1:1 mentoring relationships.
 * User can view their mentor/mentee's schedule and request a meeting (Google Calendar SDK)
    * Use OAuth login to send requests to Calendar API
 * Mentor/mentee exclusive chat window
-* Algorithm to keep track of mentor/mentee contact and send push notifications when there's been a lack of contact
+* Algorithm to suggest a potential meeting time
 * Bottom navigation for switching between chat/calendar/ToDo view
 * Animation on ToDo items or chat messages
 * Double tap gesture recognition on ToDo or message (likes)
