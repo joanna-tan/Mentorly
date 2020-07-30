@@ -177,7 +177,6 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
                     user.saveInBackground();
 
                     refreshFragment();
-
                 }
             });
 
@@ -254,7 +253,6 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
                 }
             });
         }
-
     }
 
     // Bring up the add picture fragment
@@ -291,11 +289,15 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
             try {
                 ArrayList pairRequests = (ArrayList) pairRequestQuery.find();
                 if (!pairRequests.isEmpty()) {
-                    pairPartner = null;
                     pendingSentRequests = (PairRequest) pairRequests.get(0);
 
-                    // if the request has been rejected, delete the request
+                    // if the request has been rejected, delete the request & reset the user's info
                     if (pendingSentRequests.getIsRejected()){
+                        user.put(IS_PAIRED_KEY, false);
+                        user.remove(ChatFragment.CHAT_PAIR_KEY);
+                        user.saveInBackground();
+
+                        pairPartner = null;
                         pendingSentRequests.deleteInBackground();
                     }
 
@@ -306,6 +308,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
 
                     // if the request is neither accepted or rejected, show it as pending
                     else {
+                        pairPartner = null;
                         hasPendingRequests = true;
                     }
                 }

@@ -40,7 +40,6 @@ public class ChatFragment extends Fragment {
     static final int MAX_CHAT_MESSAGES_TO_SHOW = 50;
     public static final String CHAT_PAIR_KEY = "pairID";
     public static final String USERNAME_KEY = "username";
-    public static final String USER_ID_KEY = "objectId";
 
     List<Message> allMessages;
     ChatAdapter adapter;
@@ -108,9 +107,13 @@ public class ChatFragment extends Fragment {
             ParseLiveQueryClient parseLiveQueryClient = ParseLiveQueryClient.Factory.getClient();
 
             ParseQuery<Message> parseQuery = ParseQuery.getQuery(Message.class);
+
             // Check to only receive messages from user's pairPartner
-            parseQuery.whereEqualTo(Message.FROM_ID_KEY, pairPartner);
-            parseQuery.whereEqualTo(Message.TO_ID_KEY, ParseUser.getCurrentUser());
+            ArrayList<ParseUser> users = new ArrayList<>();
+            users.add(ParseUser.getCurrentUser());
+            users.add(pairPartner);
+            parseQuery.whereContainedIn(Message.FROM_ID_KEY, users);
+            parseQuery.whereContainedIn(Message.TO_ID_KEY, users);
 
             // Connect to Parse server
             SubscriptionHandling<Message> subscriptionHandling = parseLiveQueryClient.subscribe(parseQuery);

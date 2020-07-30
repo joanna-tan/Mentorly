@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.mentorly.EventsAdapter;
 import com.example.mentorly.R;
+import com.example.mentorly.models.DateInterval;
 import com.example.mentorly.models.MyEvent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -109,6 +110,9 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     RecyclerView rvEvents;
     EventsAdapter adapter;
 
+    // collect list of event dates to pas to addEvent prediction
+    List<DateInterval> eventDates;
+
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -136,6 +140,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         // Get access to the custom title view
         TextView mTitle = toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("Calendar");
+
         // Fetch current user's partner email if needed, when creating event
         try {
             fetchPartnerInfo();
@@ -153,13 +158,14 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         clProfileView = view.findViewById(R.id.clProfileView);
 
         // Set up the event recycler view
-        allEvents = new ArrayList<MyEvent>();
+        eventDates = new ArrayList<>();
+        allEvents = new ArrayList<>();
         adapter = new EventsAdapter(getContext(), allEvents);
         rvEvents.setAdapter(adapter);
         rvEvents.setLayoutManager(new LinearLayoutManager(getContext()));
 
-//         Configure sign-in to request the user's ID, email address, and basic
-//         profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        // Configure sign-in to request the user's ID, email address, and basic
+        //  profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestScopes(new Scope("https://www.googleapis.com/auth/calendar"))
@@ -288,6 +294,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             if (cur.moveToFirst()) {
                 allEvents.clear();
                 do {
+                    final long eventId = cur.getLong(0);
                     final Date begin = new Date(cur.getLong(1));
                     final Date end = new Date(cur.getLong(2));
                     final String title = cur.getString(3);
@@ -297,9 +304,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
                     // if the event hasn't ended yet, show it on the calendar
                     if (end.after(currentTime)) {
-                        String beginRelativeTime = getRelativeTimeAgo(begin.toString());
-                        String endRelativeTime = getRelativeTimeAgo(end.toString());
-
                         // Add the event info to the adapter
                         MyEvent event = new MyEvent();
                         event.setEventTitle(title);
@@ -307,8 +311,12 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                         event.setStartDate(begin);
                         event.setEndDate(end);
 
+                        eventDates.add(new DateInterval(begin, end));
+                        Log.i(TAG, eventDates.toString());
+
                         allEvents.add(event);
                         adapter.notifyDataSetChanged();
+                        Log.i(TAG, "Event id: " + eventId);
                         Log.i(TAG, "Event title: " + title);
                         Log.i(TAG, "Description: " + description);
                         Log.i(TAG, "Event start: " + begin);
@@ -318,6 +326,40 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                 while (cur.moveToNext());
             }
         }
+    }
+
+    private List<String> checkGuests(Long eventId) {
+        Cursor cur = null;
+        ContentResolver cr = getContext().getContentResolver();
+        // array for values to store from the event
+        String[] ATTENDEE_PROJECTION = new String[]{
+                CalendarContract.Attendees._ID,                    // 0
+                CalendarContract.Attendees.ATTENDEE_EMAIL,         // 1
+                CalendarContract.Attendees.ATTENDEE_STATUS,         // 1
+        };
+
+        cur = CalendarContract.Attendees.query(cr, eventId, ATTENDEE_PROJECTION);
+
+        System.out.println("attendeeCursor count=" + cur.getCount());
+        List<String> attendees = new ArrayList<>();
+
+        if (cur.getCount() > 0) {
+            if (cur.moveToFirst()) {
+                allEvents.clear();
+                do {
+                    final String email = cur.getString(1);
+                    final int status = cur.getInt(2);
+
+                    attendees.add(email);
+
+                    // retrieve the guest info for the event
+                        Log.i(TAG, "Attendee email: " + email);
+                        Log.i(TAG, "Status: " + status);
+                }
+                while (cur.moveToNext());
+            }
+        }
+        return attendees;
     }
 
     // Format: getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
@@ -489,7 +531,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     // Show a dialog to request user input on new event
     private void showAddEventDialog() {
         FragmentManager fm = getParentFragmentManager();
-        AddEventDialogFragment addEventDialogFragment = AddEventDialogFragment.newInstance();
+        AddEventDialogFragment addEventDialogFragment = AddEventDialogFragment.newInstance(eventDates);
         // Set the calendar fragment for use later when sending event back
         addEventDialogFragment.setTargetFragment(CalendarFragment.this, 300);
         addEventDialogFragment.show(fm, "fragment_add_event");
