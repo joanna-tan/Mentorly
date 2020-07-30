@@ -56,6 +56,9 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         if (isExpandable) {
             final boolean isExpanded = position == mExpandedPosition;
             holder.details.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+            // if isExpanded set up arrow, else set down arrow
+            holder.ivDropDown.setImageResource(isExpanded ?
+                    R.drawable.ic_baseline_keyboard_arrow_up_24 : R.drawable.ic_baseline_keyboard_arrow_down_24);
             holder.itemView.setActivated(isExpanded);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

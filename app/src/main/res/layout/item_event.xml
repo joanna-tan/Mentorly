@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clEventLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/border"
-    android:paddingVertical="2dp"
-    android:paddingHorizontal="8dp"
     android:layout_margin="0dp"
+    android:background="@drawable/border"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    >
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="2dp">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="24dip"
         android:layout_height="24dip"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvEventStart"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/titleEvent"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -28,7 +26,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-
         android:fontFamily="sans-serif-black"
         android:paddingStart="?android:attr/listPreferredItemPaddingStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -46,4 +43,31 @@
         app:layout_constraintStart_toEndOf="@id/icon"
         app:layout_constraintTop_toBottomOf="@id/titleEvent"
         tools:text="July 4, 2020" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlEventDetails"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvEventStart">
+        <TextView
+            android:id="@+id/eventDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="huhhhhh"
+            tools:text="@tools:sample/lorem[50]" />
+    </RelativeLayout>
+
+
+    <ImageView
+        android:id="@+id/ivEventDropDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/tvEventStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/titleEvent"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
 </androidx.constraintlayout.widget.ConstraintLayout>

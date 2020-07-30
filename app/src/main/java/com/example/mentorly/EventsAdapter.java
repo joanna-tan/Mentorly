@@ -1,23 +1,34 @@
 package com.example.mentorly;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionManager;
 
+import com.example.mentorly.models.MyEvent;
+
+import java.util.Date;
 import java.util.List;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder> {
-    private List<String[]> events;
+
+    private List<MyEvent> events;
     private Context context;
 
-    public EventsAdapter(Context context, List<String[]> events) {
+    // global variable to track expanded card
+    public static int mExpandedPosition = -1;
+    boolean isExpandable;
+
+    public EventsAdapter(Context context, List<MyEvent> events) {
         this.events = events;
         this.context = context;
     }
@@ -32,9 +43,30 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String[] event = events.get(position);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        MyEvent event = events.get(position);
         holder.bind(event);
+
+        if (event.getEventDescription() == null || event.getEventDescription().equals("")) {
+            isExpandable = false;
+        } else {
+            isExpandable = true;
+        }
+
+        final boolean isExpanded = position == mExpandedPosition;
+        holder.eventDetails.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        // if isExpanded set up arrow, else set down arrow
+        holder.ivEventDropDown.setImageResource(isExpanded ?
+                R.drawable.ic_baseline_keyboard_arrow_up_24 : R.drawable.ic_baseline_keyboard_arrow_down_24);
+        holder.itemView.setActivated(isExpanded);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mExpandedPosition = isExpanded ? -1 : position;
+                TransitionManager.beginDelayedTransition(holder.eventDetails);
+                notifyItemChanged(position);
+            }
+        });
     }
 
     @Override
@@ -44,7 +76,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ConstraintLayout clEvent;
+        RelativeLayout eventDetails;
+        TextView eventDescription;
         ImageView icon;
+        ImageView ivEventDropDown;
         TextView tvEventStart;
         TextView tvTitleEvent;
 
@@ -54,13 +89,31 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
             tvTitleEvent = itemView.findViewById(R.id.titleEvent);
             icon = itemView.findViewById(R.id.icon);
             clEvent = itemView.findViewById(R.id.clEventLayout);
+            eventDetails = itemView.findViewById(R.id.rlEventDetails);
+            ivEventDropDown = itemView.findViewById(R.id.ivEventDropDown);
+            eventDescription = itemView.findViewById(R.id.eventDetails);
         }
 
-        public void bind(final String[] event) {
-            if (event.length >= 2) {
-                tvTitleEvent.setText(event[0]);
-                tvEventStart.setText(event[1]);
+        public void bind(MyEvent event) {
+            tvTitleEvent.setText(event.getEventTitle());
+            // if the description has text, set the textview to the description
+            if (event.getEventDescription() != null && !event.getEventDescription().equals("")) {
+                eventDescription.setText(event.getEventDescription());
+                ivEventDropDown.setVisibility(View.VISIBLE);
             }
+            // else hide the drop down arrow & the description view
+            else {
+                eventDescription.setVisibility(View.GONE);
+            }
+
+            //set the startDate view
+            Date date = event.getStartDate();
+            String day = (String) DateFormat.format("dd", date); // 20
+            String monthNumber = (String) DateFormat.format("MM", date); // 06
+            String year = (String) DateFormat.format("yyyy", date); // 2013
+            String dueString = monthNumber + "/" + day + "/" + year;
+            tvEventStart.setText("Due: " + dueString);
+
             icon.setImageResource(R.drawable.ic_outline_calendar_today_24);
         }
     }

@@ -3,10 +3,13 @@ package com.example.mentorly.models;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
+import org.parceler.Parcel;
+
 import java.util.Date;
 import java.util.List;
 
 @ParseClassName("ToDoItem")
+@Parcel(analyze={ToDoItem.class})
 public class ToDoItem extends ParseObject {
     public static final String TITLE_KEY = "title";
     public static final String BODY_KEY = "body";

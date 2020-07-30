@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.mentorly.EventsAdapter;
 import com.example.mentorly.R;
+import com.example.mentorly.models.MyEvent;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -104,7 +105,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     ConstraintLayout clProfileView;
 
     // configure the recycler view
-    List<String[]> allEvents;
+    List<MyEvent> allEvents;
     RecyclerView rvEvents;
     EventsAdapter adapter;
 
@@ -152,7 +153,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         clProfileView = view.findViewById(R.id.clProfileView);
 
         // Set up the event recycler view
-        allEvents = new ArrayList<>();
+        allEvents = new ArrayList<MyEvent>();
         adapter = new EventsAdapter(getContext(), allEvents);
         rvEvents.setAdapter(adapter);
         rvEvents.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -300,7 +301,13 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                         String endRelativeTime = getRelativeTimeAgo(end.toString());
 
                         // Add the event info to the adapter
-                        allEvents.add(new String[]{title, beginRelativeTime});
+                        MyEvent event = new MyEvent();
+                        event.setEventTitle(title);
+                        event.setEventDescription(description);
+                        event.setStartDate(begin);
+                        event.setEndDate(end);
+
+                        allEvents.add(event);
                         adapter.notifyDataSetChanged();
                         Log.i(TAG, "Event title: " + title);
                         Log.i(TAG, "Description: " + description);
