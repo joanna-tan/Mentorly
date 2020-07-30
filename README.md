@@ -4,6 +4,7 @@
 1. [Overview](#Overview)
 1. [Product Spec](#Product-Spec)
 1. [Wireframes](#Wireframes)
+1. [Walkthroughs](#Walkthroughs)
 
 ## Overview
 ### Description
@@ -135,3 +136,11 @@ Optional:
     `POST`    | calendarId/events/quickAdd   | use a String to add an event
     `POST`    | /calendarId/events  | add a new event to the calendar
     `GET`    | /users/me/calendarList/calendarId  | retrieve all calendars for the current user
+    
+## Walkthroughs
+<img src='general_layout_v1.gif'/>
+<img src='register_walkthrough.gif'/>
+<img src='pair_req.gif'/>
+<img src='live_chat.gif'/>
+<img src='camera_todo.gif'/>
+<img src='event_invite.gif'/>
