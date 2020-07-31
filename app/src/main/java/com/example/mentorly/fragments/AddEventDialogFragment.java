@@ -229,30 +229,53 @@ public class AddEventDialogFragment extends DialogFragment {
     // given a list of start and end times, find the non-overlap
     @RequiresApi(api = Build.VERSION_CODES.N)
     private DateInterval suggestEventTime(List<DateInterval> eventTimes) {
-        // suggest a time tomorrow, length of one hour
         Calendar newStartTime = Calendar.getInstance();
         Calendar newEndTime = Calendar.getInstance();
 
+        // Save the current time
         Calendar now = Calendar.getInstance();
         now.setTime(new Date(System.currentTimeMillis()));
+        // Create variable weekFromNow which keeps track of the date 1 week later
+        Calendar weekFromNow = Calendar.getInstance();
+        weekFromNow.setTime(now.getTime());
+        weekFromNow.add(Calendar.DATE, 7);
 
-        if (eventTimes.size() == 1) {
-            now.setTime(eventTimes.get(0).getEnd());
-        } else {
-            now.setTime(eventTimes.get(0).getEnd());
+        // Default set the new event to one day from now, same hour
+        newStartTime.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH),
+                now.get(Calendar.HOUR_OF_DAY), 0);
+        newStartTime.add(Calendar.DAY_OF_MONTH, 1);
+        // Set new end time one hour after the start time
+        newEndTime.setTime(newStartTime.getTime());
+        newEndTime.add(Calendar.HOUR_OF_DAY, 1);
+
+        // Compare the default by creating a DateInterval
+        DateInterval newInterval = new DateInterval(newStartTime.getTime(), newEndTime.getTime());
+        // Change the event time by one hour if an overlap occurs
+        for (DateInterval interval : eventTimes) {
+            // If the time is set to after 6pm, shift to tomorrow at 8am
+            if (newInterval.isEndOfDay()) {
+                newInterval.shiftToStartOfDay();
+            }
+            // If the time overlaps, move it by one hour
+            if (newInterval.overlapsWith(interval)) {
+                newInterval.shiftHour();
+            }
         }
 
-        newStartTime.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH) + 1,
-                now.get(Calendar.HOUR_OF_DAY), 0);
-        newEndTime.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH) + 1,
-                now.get(Calendar.HOUR_OF_DAY) + 1, 0);
+        // If the meeting time is after one week from now, reset it to increment by 30 minutes instead
+        if (newInterval.getStart().after(weekFromNow.getTime())) {
+            // Reset the interval
+            newInterval.resetInterval(now.getTime());
 
-        DateInterval newInterval = new DateInterval(newStartTime.getTime(), newEndTime.getTime());
-
-        // change the event time by one day if an overlap occurs
-        for (DateInterval interval : eventTimes) {
-            if (newInterval.overlapsWith(interval)) {
-                newInterval.shiftDate();
+            for (DateInterval interval : eventTimes) {
+                // If the time is set to after 6pm, shift to tomorrow at 8am
+                if (newInterval.isEndOfDay()) {
+                    newInterval.shiftToStartOfDay();
+                }
+                // If the time overlaps, move it by 30 minutes
+                if (newInterval.overlapsWith(interval)) {
+                    newInterval.shiftHalfHour();
+                }
             }
         }
 
