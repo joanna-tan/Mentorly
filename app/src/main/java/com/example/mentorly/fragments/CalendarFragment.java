@@ -311,6 +311,8 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                         event.setStartDate(begin);
                         event.setEndDate(end);
 
+                        event.setAttendees(checkGuests(eventId));
+
                         eventDates.add(new DateInterval(begin, end));
                         Log.i(TAG, eventDates.toString());
 
@@ -345,7 +347,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
         if (cur.getCount() > 0) {
             if (cur.moveToFirst()) {
-                allEvents.clear();
                 do {
                     final String email = cur.getString(1);
                     final int status = cur.getInt(2);

@@ -47,11 +47,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
         MyEvent event = events.get(position);
         holder.bind(event);
 
-        if (event.getEventDescription() == null || event.getEventDescription().equals("")) {
-            isExpandable = false;
-        } else {
-            isExpandable = true;
-        }
+        isExpandable = (event.getEventDescription() != null && !event.getEventDescription().equals("")) ||
+                (event.getAttendees() != null && !event.getAttendees().isEmpty());
 
         final boolean isExpanded = position == mExpandedPosition;
         holder.eventDetails.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -78,6 +75,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
         ConstraintLayout clEvent;
         RelativeLayout eventDetails;
         TextView eventDescription;
+        TextView eventAttendees;
         ImageView icon;
         ImageView ivEventDropDown;
         TextView tvEventStart;
@@ -92,19 +90,48 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
             eventDetails = itemView.findViewById(R.id.rlEventDetails);
             ivEventDropDown = itemView.findViewById(R.id.ivEventDropDown);
             eventDescription = itemView.findViewById(R.id.eventDetails);
+            eventAttendees = itemView.findViewById(R.id.eventAttendees);
         }
 
         public void bind(MyEvent event) {
             tvTitleEvent.setText(event.getEventTitle());
-            // if the description has text, set the textview to the description
-            if (event.getEventDescription() != null && !event.getEventDescription().equals("")) {
-                eventDescription.setText(event.getEventDescription());
+            // if the description has text & attendees, show the drop down arrow
+            if (event.getEventDescription() != null && !event.getEventDescription().equals("") && event.getAttendees() != null) {
+                eventDescription.setVisibility(View.VISIBLE);
                 ivEventDropDown.setVisibility(View.VISIBLE);
+                eventAttendees.setVisibility(View.VISIBLE);
+
+                eventDescription.setText("Description: " + event.getEventDescription());
+                StringBuilder allAttendees = new StringBuilder();
+                allAttendees.append("Attendees: ");
+                for (String attendee : event.getAttendees()) {
+                    allAttendees.append(attendee);
+                }
+                eventAttendees.setText(allAttendees);
             }
             // else hide the drop down arrow & the description view
-            else {
+            else if (event.getAttendees() != null && !event.getAttendees().isEmpty()) {
+                ivEventDropDown.setVisibility(View.VISIBLE);
+                eventAttendees.setVisibility(View.VISIBLE);
                 eventDescription.setVisibility(View.GONE);
+
+                StringBuilder allAttendees = new StringBuilder();
+                allAttendees.append("Attendees: ");
+                for (String attendee : event.getAttendees()) {
+                    allAttendees.append(attendee);
+                }
+                eventAttendees.setText(allAttendees);
+            } else if (event.getEventDescription() != null && !event.getEventDescription().equals("")) {
+                eventDescription.setVisibility(View.VISIBLE);
+                ivEventDropDown.setVisibility(View.VISIBLE);
+                eventAttendees.setVisibility(View.GONE);
+                eventDescription.setText("Description: " + event.getEventDescription());
+            } else {
+                eventAttendees.setVisibility(View.GONE);
+                eventDescription.setVisibility(View.GONE);
+                ivEventDropDown.setVisibility(View.GONE);
             }
+
 
             //set the startDate view
             Date date = event.getStartDate();
