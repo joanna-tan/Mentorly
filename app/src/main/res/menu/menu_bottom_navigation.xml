@@ -25,6 +25,6 @@
         android:id="@+id/action_profile"
         android:icon="@drawable/ic_baseline_person_24"
         app:showAsAction="ifRoom"
-        android:title="Profile" />
+        android:title="@string/profile" />
 
 </menu>

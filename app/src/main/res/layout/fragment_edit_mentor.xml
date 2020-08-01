@@ -11,7 +11,7 @@
         android:id="@+id/lbl_your_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mentor username" />
+        android:text="@string/mentor_username" />
 
     <EditText
         android:id="@+id/etPairName"
@@ -25,5 +25,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="Submit" />
+        android:text="@string/submit" />
 </LinearLayout>

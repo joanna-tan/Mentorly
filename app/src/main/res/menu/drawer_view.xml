@@ -5,15 +5,15 @@
         <item
             android:id="@+id/nav_first_fragment"
             android:icon="@drawable/ic_baseline_mail_outline_24"
-            android:title="Profile" />
+            android:title="@string/profile" />
         <item
             android:id="@+id/nav_second_fragment"
             android:icon="@drawable/ic_baseline_folder_open_24"
-            android:title="Files" />
+            android:title="@string/files" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_baseline_logout_24"
-            android:title="Logout" />
+            android:title="@string/logout" />
 
     </group>
 
@@ -22,11 +22,11 @@
         <item
             android:id="@+id/nav_something"
             android:icon="@drawable/ic_baseline_help_outline_24"
-            android:title="Help" />
+            android:title="@string/help" />
         <item
             android:id="@+id/nav_out"
             android:icon="@drawable/ic_baseline_settings_24"
-            android:title="Settings" />
+            android:title="@string/settings" />
 
     </group>
 </menu>

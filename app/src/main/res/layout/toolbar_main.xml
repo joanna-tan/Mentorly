@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:fontFamily="sans-serif-light"
-        android:text="Toolbar Title"
+        android:text="@string/toolbar_title"
         android:textColor="@android:color/white" />
 
 

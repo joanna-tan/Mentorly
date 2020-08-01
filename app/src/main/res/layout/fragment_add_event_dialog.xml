@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="15dp"
+        android:paddingHorizontal="8dp"
         android:paddingVertical="5dp">
 
 
@@ -19,38 +19,44 @@
             android:id="@+id/tvAutofillEvent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="10dp"
             android:clickable="true"
             android:foreground="?android:attr/selectableItemBackgroundBorderless"
-            android:text="or click to autofill"
+            android:text="@string/or_click_to_autofill"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/color_blue"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/etSelectDate"
             app:layout_constraintStart_toEndOf="@+id/etSelectDate"
-            app:layout_constraintTop_toTopOf="@+id/etSelectDate" />
+            app:layout_constraintTop_toTopOf="@+id/etSelectDate"
+            android:focusable="true" />
 
         <EditText
             android:id="@+id/etEventTitle"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:background="@android:drawable/editbox_background_normal"
-            android:hint="Event title"
+            android:hint="@string/event_title"
             android:imeOptions="actionDone"
             android:inputType="text"
             app:layout_constraintBottom_toTopOf="@id/etEventBody"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/tvAddEventDialogTitle"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/etEventBody"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:background="@android:drawable/editbox_background_normal"
-            android:hint="Description (optional)"
+            android:hint="@string/description_optional"
             android:imeOptions="actionDone"
             android:inputType="text"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etEventTitle" />
+            app:layout_constraintTop_toBottomOf="@id/etEventTitle"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/etSelectDate"
@@ -59,23 +65,27 @@
             android:layout_marginTop="8dp"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
-            android:hint="Select date"
+            android:hint="@string/select_date"
             android:paddingTop="8dp"
             app:layout_constraintBottom_toTopOf="@id/etSelectTime"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etEventBody" />
+            app:layout_constraintTop_toBottomOf="@id/etEventBody"
+            android:importantForAutofill="no"
+            android:inputType="date" />
 
         <EditText
             android:id="@+id/etSelectTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
-            android:hint="Start time"
+            android:hint="@string/start_time"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etSelectDate" />
+            app:layout_constraintTop_toBottomOf="@+id/etSelectDate"
+            android:importantForAutofill="no"
+            android:inputType="time" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSelectEndTime"
@@ -84,7 +94,7 @@
             android:layout_marginStart="8dp"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
-            android:hint="End time"
+            android:hint="@string/end_time"
             android:singleLine="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintBottom_toBottomOf="@+id/etSelectTime"
@@ -96,7 +106,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="Send invite"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/color_soft_purple"
+            android:text="@string/send_invite"
+            android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/etSelectEndTime" />
 
@@ -107,11 +120,46 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif-light"
-            android:text="to"
+            android:text="@string/to"
             app:layout_constraintBottom_toBottomOf="@+id/etSelectEndTime"
             app:layout_constraintEnd_toStartOf="@+id/etSelectEndTime"
             app:layout_constraintStart_toEndOf="@+id/etSelectTime"
             app:layout_constraintTop_toTopOf="@+id/etSelectEndTime" />
+
+        <Button
+            android:id="@+id/btnCreateAloneEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/color_blue"
+            android:text="@string/create"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/btnSubmitEvent"
+            app:layout_constraintEnd_toStartOf="@id/tvOrInvite"
+            app:layout_constraintTop_toTopOf="@+id/btnSubmitEvent" />
+
+        <TextView
+            android:id="@+id/tvOrInvite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/or"
+            app:layout_constraintBottom_toBottomOf="@+id/btnSubmitEvent"
+            app:layout_constraintEnd_toStartOf="@+id/btnSubmitEvent"
+            app:layout_constraintTop_toTopOf="@+id/btnSubmitEvent" />
+
+        <TextView
+            android:id="@+id/tvAddEventDialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:foregroundGravity="center_horizontal"
+            android:text="@string/create_event"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -353,8 +353,8 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                     attendees.add(email);
 
                     // retrieve the guest info for the event
-                        Log.i(TAG, "Attendee email: " + email);
-                        Log.i(TAG, "Status: " + status);
+                    Log.i(TAG, "Attendee email: " + email);
+                    Log.i(TAG, "Status: " + status);
                 }
                 while (cur.moveToNext());
             }
@@ -382,7 +382,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     // Method for adding and saving an event to calendar
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void addEvent(long calID, String title, String description, int[] startSelected, int[] endSelected) {
+    private void addEvent(long calID, String title, String description, int[] startSelected, int[] endSelected, boolean sendInvite) {
         long startMillis = 0;
         long endMillis = 0;
         Calendar beginTime = null;
@@ -413,7 +413,9 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         long eventID = Long.parseLong(uriEvent.getLastPathSegment());
         Log.i(TAG, "eventID" + eventID + " event created");
 
-        addAttendee(eventID);
+        if (sendInvite) {
+            addAttendee(eventID);
+        }
     }
 
     private void addAttendee(long eventID) {
@@ -422,8 +424,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         if (pairPartner == null) {
             Snackbar.make(getView(), "Event created, no invites sent", Snackbar.LENGTH_SHORT).
                     setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
-        }
-        else if (pairEmail == null){
+        } else if (pairEmail == null) {
             Snackbar.make(getView(), "Event created, partner does not have email invite", Snackbar.LENGTH_SHORT).
                     setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
         }
@@ -538,9 +539,9 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     }
 
     @Override
-    public void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected) {
+    public void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected, boolean sendInvite) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            addEvent(calendarId, title, description, startSelected, endSelected);
+            addEvent(calendarId, title, description, startSelected, endSelected, sendInvite);
         }
         refreshFragment();
     }

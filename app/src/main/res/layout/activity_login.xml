@@ -94,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
         android:clickable="true"
-        android:text="Forgot your password?"
+        android:text="@string/forgot_your_password"
         android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:textColor="@color/color_blue"
         app:layout_constraintEnd_toEndOf="parent"

@@ -10,50 +10,68 @@
     android:paddingVertical="5dp">
 
 
+    <TextView
+        android:id="@+id/tvAddToDoDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:foregroundGravity="center_horizontal"
+        android:text="@string/add_a_to_do"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/etToDoTitle"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:hint="ToDo Title"
+        android:layout_marginTop="10dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:hint="@string/to_do"
         android:imeOptions="actionDone"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@id/etToDoBody"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@android:drawable/editbox_background_normal"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/tvAddToDoDialogTitle"
+        android:importantForAutofill="no" />
 
     <EditText
         android:id="@+id/etToDoBody"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:hint="Description (optional)"
+        android:layout_marginTop="4dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:hint="@string/description_optional"
         android:imeOptions="actionDone"
         android:inputType="text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etToDoTitle"
-        android:background="@android:drawable/editbox_background_normal"
-        />
+        android:importantForAutofill="no" />
 
     <EditText
         android:id="@+id/etToDoDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:background="@android:drawable/editbox_background_normal"
         android:focusableInTouchMode="false"
-        android:hint="Select date"
+        android:hint="@string/select_date"
         android:paddingTop="8dp"
         app:layout_constraintBottom_toTopOf="@id/btnSubmit"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etToDoBody" />
+        app:layout_constraintTop_toBottomOf="@id/etToDoBody"
+        android:importantForAutofill="no"
+        android:inputType="date" />
 
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_marginTop="8dp"
-        android:text="Add Item"
+        android:backgroundTint="@color/color_soft_purple"
+        android:text="@string/add_item"
+        android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etToDoDate" />
 </androidx.constraintlayout.widget.ConstraintLayout>

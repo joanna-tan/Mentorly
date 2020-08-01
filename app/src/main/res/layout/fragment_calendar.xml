@@ -21,7 +21,7 @@
                 android:id="@+id/btnGoogleSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sign in with Google"
+                android:text="@string/sign_in_with_google"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/action_margin"
                 android:layout_marginRight="@dimen/action_margin"
-                android:text="Add event item"
+                android:text="@string/add_event_item"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:elevation="1dp"
-                android:text="Sign out of Google"
+                android:text="@string/sign_out_of_google"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/clProfileView" />
 

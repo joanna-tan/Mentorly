@@ -36,7 +36,8 @@ import java.util.List;
 
 public class AddEventDialogFragment extends DialogFragment {
 
-    private Button btnSubmit;
+    private Button btnSubmitAndInvite;
+    private Button btnSubmitNoInvite;
     private EditText etEventBody;
     private EditText etEventTitle;
     private EditText etDatePick;
@@ -62,7 +63,19 @@ public class AddEventDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.fragment_add_event_dialog, container);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //expand the dialog window to match screen size
+        ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
+
     }
 
     @Override
@@ -70,7 +83,9 @@ public class AddEventDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         final List<DateInterval> eventDates = getArguments().getParcelableArrayList("dates");
 
-        btnSubmit = view.findViewById(R.id.btnSubmitEvent);
+        // set the views
+        btnSubmitAndInvite = view.findViewById(R.id.btnSubmitEvent);
+        btnSubmitNoInvite = view.findViewById(R.id.btnCreateAloneEvent);
         etTimePick = view.findViewById(R.id.etSelectTime);
         etEndTimePick = view.findViewById(R.id.etSelectEndTime);
         etDatePick = view.findViewById(R.id.etSelectDate);
@@ -82,13 +97,12 @@ public class AddEventDialogFragment extends DialogFragment {
         startSelected = new int[5];
         endSelected = new int[5];
 
-        // show input keyboard for event title
         etEventTitle.requestFocus();
+        // show input keyboard for event title on dialog launch
         getDialog().getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-        // click to add a suggested time. probably take an input of all the event times & calculate some
-        // non-conflict
+        // click to add a suggested time.take an input of all the event times & calculate some non-conflict
         tvAutofillTime.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -123,6 +137,7 @@ public class AddEventDialogFragment extends DialogFragment {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View view) {
+                hideKeyboard();
 
                 // show time picker for start
                 final Calendar c = Calendar.getInstance();
@@ -148,6 +163,7 @@ public class AddEventDialogFragment extends DialogFragment {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View view) {
+                hideKeyboard();
 
                 // show the time picker for end time
                 final Calendar c = Calendar.getInstance();
@@ -173,6 +189,7 @@ public class AddEventDialogFragment extends DialogFragment {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View view) {
+                hideKeyboard();
                 final Calendar cldr = Calendar.getInstance();
                 int day = cldr.get(Calendar.DAY_OF_MONTH);
                 int month = cldr.get(Calendar.MONTH);
@@ -197,33 +214,50 @@ public class AddEventDialogFragment extends DialogFragment {
         });
 
         //return event selections back to the calendar fragment
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
+        btnSubmitAndInvite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (etEventTitle.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Title cannot be empty!", Toast.LENGTH_SHORT).show();
-                } else if (etDatePick.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please select a date for the event", Toast.LENGTH_SHORT).show();
-                } else if (etTimePick.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter start time", Toast.LENGTH_SHORT).show();
-                } else if (etEndTimePick.getText().toString().isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter an end time", Toast.LENGTH_SHORT).show();
-                }
-                // if the start hour is greater than end hour
-                else if (startSelected[3] > endSelected[3] ||
-                        startSelected[3] == endSelected[3] && startSelected[4] > endSelected[4]) {
-                    Toast.makeText(getContext(), "Please select a valid end time", Toast.LENGTH_SHORT).show();
-
-                    // Set the color of the end time to RED to indicate error
-                    String endTime = etEndTimePick.getText().toString();
-                    Spannable WordtoSpan = new SpannableString(endTime);
-                    WordtoSpan.setSpan(new ForegroundColorSpan(Color.RED), 0, endTime.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    etEndTimePick.setText(WordtoSpan);
-                } else {
-                    sendBackResult();
-                }
+                createEvent(true);
             }
         });
+
+        // separate listener for creating events for self
+        btnSubmitNoInvite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createEvent(false);
+            }
+        });
+    }
+
+    private void createEvent(boolean sendEmailInvite) {
+        if (etEventTitle.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Title cannot be empty!", Toast.LENGTH_SHORT).show();
+        } else if (etDatePick.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please select a date for the event", Toast.LENGTH_SHORT).show();
+        } else if (etTimePick.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please enter start time", Toast.LENGTH_SHORT).show();
+        } else if (etEndTimePick.getText().toString().isEmpty()) {
+            Toast.makeText(getContext(), "Please enter an end time", Toast.LENGTH_SHORT).show();
+        }
+        // if the start hour is greater than end hour
+        else if (startSelected[3] > endSelected[3] ||
+                startSelected[3] == endSelected[3] && startSelected[4] > endSelected[4]) {
+            Toast.makeText(getContext(), "Please select a valid end time", Toast.LENGTH_SHORT).show();
+
+            // Set the color of the end time to RED to indicate error
+            String endTime = etEndTimePick.getText().toString();
+            Spannable WordtoSpan = new SpannableString(endTime);
+            WordtoSpan.setSpan(new ForegroundColorSpan(Color.RED), 0, endTime.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            etEndTimePick.setText(WordtoSpan);
+        } else {
+            sendBackResult(sendEmailInvite);
+        }
+    }
+
+    private void hideKeyboard() {
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
     }
 
     // given a list of start and end times, find the non-overlap
@@ -312,17 +346,17 @@ public class AddEventDialogFragment extends DialogFragment {
 
     // Defines the listener interface
     public interface AddEventDialogFragmentListener {
-        void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected);
+        void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected, boolean sendInvite);
 
     }
 
     // Call this method to send the data back to the parent fragment
-    public void sendBackResult() {
+    public void sendBackResult(boolean sendEmailInvite) {
         AddEventDialogFragmentListener listener = (AddEventDialogFragmentListener) getTargetFragment();
         if (etEventBody.getText().toString().isEmpty()) {
-            listener.onFinishAddEventDialog(etEventTitle.getText().toString(), null, startSelected, endSelected);
+            listener.onFinishAddEventDialog(etEventTitle.getText().toString(), null, startSelected, endSelected, sendEmailInvite);
         } else {
-            listener.onFinishAddEventDialog(etEventTitle.getText().toString(), etEventBody.getText().toString(), startSelected, endSelected);
+            listener.onFinishAddEventDialog(etEventTitle.getText().toString(), etEventBody.getText().toString(), startSelected, endSelected, sendEmailInvite);
         }
         dismiss();
     }
