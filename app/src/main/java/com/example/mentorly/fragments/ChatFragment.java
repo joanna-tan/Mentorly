@@ -1,7 +1,6 @@
 package com.example.mentorly.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,17 +53,6 @@ public class ChatFragment extends Fragment {
 
     // Keep track of initial load to scroll to the bottom of the ListView
     boolean mFirstLoad;
-
-    // Create a handler which can run refresh messages periodically
-    static final int POLL_INTERVAL = 1000; // milliseconds
-    Handler myHandler = new android.os.Handler();
-    Runnable mRefreshMessagesRunnable = new Runnable() {
-        @Override
-        public void run() {
-            refreshMessages();
-            myHandler.postDelayed(this, POLL_INTERVAL);
-        }
-    };
 
     public ChatFragment() {
         // Required empty public constructor

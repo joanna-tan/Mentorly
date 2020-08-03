@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Build;
@@ -164,6 +165,10 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         rvEvents.setAdapter(adapter);
         rvEvents.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        float offsetPx = 30;
+        BottomOffsetDecoration bottomOffsetDecoration = new BottomOffsetDecoration((int) offsetPx);
+        rvEvents.addItemDecoration(bottomOffsetDecoration);
+
         // Configure sign-in to request the user's ID, email address, and basic
         //  profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -182,6 +187,28 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
         // Add spin animation on floating button when fragment is created
         animateFloatingActionButton();
+    }
+
+    // Class to define the offset height in recycler view
+    static class BottomOffsetDecoration extends RecyclerView.ItemDecoration {
+        private int mBottomOffset;
+
+        public BottomOffsetDecoration(int bottomOffset) {
+            mBottomOffset = bottomOffset;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            super.getItemOffsets(outRect, view, parent, state);
+            int dataSize = state.getItemCount();
+            int position = parent.getChildAdapterPosition(view);
+            if (dataSize > 0 && position == dataSize - 1) {
+                outRect.set(0, 0, 0, mBottomOffset);
+            } else {
+                outRect.set(0, 0, 0, 0);
+            }
+
+        }
     }
 
     // Fetch partner info and partner email (if it exists)

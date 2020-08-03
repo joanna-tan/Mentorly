@@ -164,7 +164,6 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
         itemTouchHelper.attachToRecyclerView(rvItems);
     }
 
-
     // Spinning animation when To Do fragment is created
     private void animateToDoActionButton() {
         btnAdd.animate()
