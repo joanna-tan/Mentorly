@@ -30,10 +30,12 @@
             android:layout_height="100dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:scaleType="fitXY"
+            android:background="@drawable/round_image_border"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
+            tools:srcCompat="@tools:sample/avatars"
+            android:cropToPadding="true"
+            />
 
         <TextView
             android:id="@+id/tvPairProfile"
@@ -54,9 +56,9 @@
             android:layout_height="100dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
-            android:scaleType="fitXY"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvPairProfile"
+            android:background="@drawable/round_image_border"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
@@ -129,9 +131,11 @@
 
         <ImageButton
             android:id="@+id/btnChangeProfilePic"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:gravity="center_vertical|center_horizontal"
             android:src="@drawable/ic_baseline_add_24"
+            android:background="@drawable/round_button"
             android:backgroundTint="@color/colorAccent"
             android:tint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="@+id/ivProfileImage"

@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.example.mentorly.ChatAdapter;
 import com.example.mentorly.GlideApp;
 import com.example.mentorly.R;
@@ -107,7 +108,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
         if (profileImage != null) {
             GlideApp.with(getContext())
                     .load(profileImage.getUrl())
-                    .transform(new RoundedCornersTransformation(50, 20))
+                    .apply(RequestOptions.circleCropTransform())
                     .into(ivProfileImage);
         } else {
             ivProfileImage.setImageResource(R.drawable.ic_baseline_person_24);
@@ -139,7 +140,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
             if (pairProfileImage != null) {
                 GlideApp.with(getContext())
                         .load(pairProfileImage.getUrl())
-                        .transform(new RoundedCornersTransformation(50, 20))
+                        .apply(RequestOptions.circleCropTransform())
                         .into(ivPairProfileImage);
             } else {
                 ivPairProfileImage.setImageResource(R.drawable.ic_baseline_person_24);

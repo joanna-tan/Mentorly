@@ -43,22 +43,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
-<!--            <TextView-->
-<!--                android:id="@+id/tvObjectives"-->
-<!--                android:visibility="gone"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="5dp"-->
-<!--                android:layout_marginBottom="5dp"-->
-<!--                android:fontFamily="@font/satisfy"-->
-<!--                android:text="Objectives"-->
-<!--                android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/rvItems"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

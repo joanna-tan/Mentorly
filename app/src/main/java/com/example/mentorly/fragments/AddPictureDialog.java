@@ -156,6 +156,7 @@ public class AddPictureDialog extends DialogFragment {
                     Toast.makeText(getContext(), "Picture wasn't saved!", Toast.LENGTH_SHORT).show();
                 }
                 assert resizedUri != null;
+                photoFile = resizedUri;
                 Bitmap takenImage = BitmapFactory.decodeFile(resizedUri.getAbsolutePath());
 
                 // Load the taken image into a preview
@@ -178,11 +179,16 @@ public class AddPictureDialog extends DialogFragment {
         int screenWidth = DeviceDimensionsHelper.getDisplayWidth(Objects.requireNonNull(getContext()));
 
         //Resize bitmap
-        Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(rawTakenImage, screenWidth);
-        //Configure byte output stream
+        Bitmap src = BitmapScaler.scaleToFitWidth(rawTakenImage, screenWidth);
+
+        int width = src.getWidth();
+        int height = src.getHeight();
+        int crop = Math.abs(width - height) / 4;
+        Bitmap cropImg = Bitmap.createBitmap(src, 0, crop, width, width);
+
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         //Compress the image further
-        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+        cropImg.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
         //Create a new file for the resized bitmap
         File resizedFile = getPhotoFileUri(photoFileName + "_resize");
 
