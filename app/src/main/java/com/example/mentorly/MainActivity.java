@@ -118,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_logout:
                     userSignOut();
                     break;
+                case R.id.nav_files:
+                    Intent i = new Intent(this, BookmarkActivity.class);
+                    startActivity(i);
+                    break;
                 default:
                     Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show();
                     break;

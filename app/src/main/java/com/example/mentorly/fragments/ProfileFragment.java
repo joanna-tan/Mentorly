@@ -89,7 +89,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
         TextView mTitle = toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("Profile");
 
-        ivProfileImage = view.findViewById(R.id.ivProfileImage);
+        ivProfileImage = view.findViewById(R.id.ivBookmarkProfileImage);
         tvUsername = view.findViewById(R.id.tvUsername);
         ivPairProfileImage = view.findViewById(R.id.ivPairProfileImage);
         tvPairUsername = view.findViewById(R.id.tvPairUsername);

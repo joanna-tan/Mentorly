@@ -9,6 +9,7 @@ public class Message extends ParseObject {
     public static final String TO_ID_KEY = "toId";
     public static final String FROM_ID_KEY = "fromId";
     public static final String BODY_KEY = "body";
+    public static final String SAVED_BY_KEY = "savedBy";
 
     public ParseUser getToId() {
         return getParseUser(TO_ID_KEY);
@@ -33,5 +34,6 @@ public class Message extends ParseObject {
     public void setBody(String body) {
         put(BODY_KEY, body);
     }
+
 }
 

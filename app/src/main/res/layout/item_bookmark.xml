@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="0dp"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:background="@drawable/border">
+
+    <ImageView
+        android:id="@+id/ivBookmarkProfileImage"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/round_image_border"
+        android:contentDescription="Profile image"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tvScreenName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/ivBookmarkProfileImage"
+        android:fontFamily="sans-serif-light"
+        android:textSize="16sp"
+        tools:text="joanna" />
+
+    <TextView
+        android:id="@+id/tvTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toEndOf="@+id/tvScreenName"
+        android:fontFamily="sans-serif-light"
+        android:gravity="end"
+        android:textSize="16sp"
+        tools:text="2 days ago" />
+
+    <com.example.mentorly.LinkifiedTextView
+        android:id="@+id/tvBookmarkBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvScreenName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@+id/ivBookmarkProfileImage"
+        android:autoLink="all"
+        android:fontFamily="sans-serif-light"
+        android:linksClickable="true"
+        android:textSize="16sp"
+        tools:text="@tools:sample/lorem[55]" />
+
+</RelativeLayout>

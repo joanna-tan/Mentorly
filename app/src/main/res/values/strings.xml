@@ -40,7 +40,7 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
-<!--    Screen archetype string resources-->
+    <!--    Screen archetype string resources-->
     <string name="no_todo_view">Your To Do list is empty! Tap the button below to add more items.</string>
     <string name="add_a_to_do">Add a To Do</string>
     <string name="to_do">To Do</string>
@@ -75,4 +75,5 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="toolbar_title">Toolbar Title</string>
+    <string name="bookmarks">Bookmarks</string>
 </resources>

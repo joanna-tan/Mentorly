@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/tvBodyOther"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="10dp"
@@ -41,11 +41,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/ivProfileOther"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap" />
+        app:layout_constrainedWidth="true"
+        android:autoLink="all"
+        android:linksClickable="true"
+        />
 
     <TextView
         android:id="@+id/tvBodyMe"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="5dp"
@@ -64,7 +67,10 @@
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap" />
+        app:layout_constrainedWidth="true"
+        android:autoLink="all"
+        android:linksClickable="true"
+        />
 
     <ImageView
         android:id="@+id/ivProfileMe"
