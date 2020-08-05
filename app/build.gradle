@@ -83,4 +83,8 @@ dependencies {
 
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
+
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation project(':commonlib')
+    implementation project(':mobilertc')
 }

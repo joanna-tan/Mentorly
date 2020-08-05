@@ -103,7 +103,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
 
                 eventDescription.setText("Description: " + event.getEventDescription());
                 StringBuilder allAttendees = new StringBuilder();
-                allAttendees.append("Attendees: ");
+                allAttendees.append("Guests: ");
                 for (String attendee : event.getAttendees()) {
                     allAttendees.append(attendee);
                 }
@@ -116,7 +116,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
                 eventDescription.setVisibility(View.GONE);
 
                 StringBuilder allAttendees = new StringBuilder();
-                allAttendees.append("Attendees: ");
+                allAttendees.append("Guests: ");
                 for (String attendee : event.getAttendees()) {
                     allAttendees.append(attendee);
                 }

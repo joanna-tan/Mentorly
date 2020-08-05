@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/flAddEvent"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -21,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:clickable="true"
+            android:focusable="true"
             android:foreground="?android:attr/selectableItemBackgroundBorderless"
             android:text="@string/or_click_to_autofill"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -28,8 +30,7 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/etSelectDate"
             app:layout_constraintStart_toEndOf="@+id/etSelectDate"
-            app:layout_constraintTop_toTopOf="@+id/etSelectDate"
-            android:focusable="true" />
+            app:layout_constraintTop_toTopOf="@+id/etSelectDate" />
 
         <EditText
             android:id="@+id/etEventTitle"
@@ -39,11 +40,11 @@
             android:background="@android:drawable/editbox_background_normal"
             android:hint="@string/event_title"
             android:imeOptions="actionDone"
+            android:importantForAutofill="no"
             android:inputType="text"
             app:layout_constraintBottom_toTopOf="@id/etEventBody"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvAddEventDialogTitle"
-            android:importantForAutofill="no" />
+            app:layout_constraintTop_toBottomOf="@+id/tvAddEventDialogTitle" />
 
         <EditText
             android:id="@+id/etEventBody"
@@ -53,10 +54,10 @@
             android:background="@android:drawable/editbox_background_normal"
             android:hint="@string/description_optional"
             android:imeOptions="actionDone"
+            android:importantForAutofill="no"
             android:inputType="text"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etEventTitle"
-            android:importantForAutofill="no" />
+            app:layout_constraintTop_toBottomOf="@id/etEventTitle" />
 
         <EditText
             android:id="@+id/etSelectDate"
@@ -66,12 +67,12 @@
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:hint="@string/select_date"
+            android:importantForAutofill="no"
+            android:inputType="date"
             android:paddingTop="8dp"
             app:layout_constraintBottom_toTopOf="@id/etSelectTime"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etEventBody"
-            android:importantForAutofill="no"
-            android:inputType="date" />
+            app:layout_constraintTop_toBottomOf="@id/etEventBody" />
 
         <EditText
             android:id="@+id/etSelectTime"
@@ -81,11 +82,11 @@
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:hint="@string/start_time"
+            android:importantForAutofill="no"
+            android:inputType="time"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etSelectDate"
-            android:importantForAutofill="no"
-            android:inputType="time" />
+            app:layout_constraintTop_toBottomOf="@+id/etSelectDate" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSelectEndTime"
@@ -160,6 +161,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/checkIsZoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zoom meeting"
+            app:layout_constraintBottom_toTopOf="@+id/btnSubmitEvent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

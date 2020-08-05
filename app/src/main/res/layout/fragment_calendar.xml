@@ -27,7 +27,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_in_with_google"
+                app:layout_constraintEnd_toStartOf="@id/btnZoomSignIn"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/btnZoomSignIn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="Sign in with Zoom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/signOut"
+                app:layout_constraintBottom_toBottomOf="@id/signOut"
+                app:layout_constraintStart_toEndOf="@id/signOut"
+                />
+
+            <Button
+                android:id="@+id/signOut"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:elevation="1dp"
+                android:text="@string/sign_out_of_google"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnZoomSignIn"
+                app:layout_constraintBottom_toTopOf="@id/rvEvents"
+                app:layout_constraintTop_toBottomOf="@id/clProfileView" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/clProfileView"
@@ -74,15 +100,6 @@
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
-            <Button
-                android:id="@+id/signOut"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:elevation="1dp"
-                android:text="@string/sign_out_of_google"
-                android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@id/rvEvents"
-                app:layout_constraintTop_toBottomOf="@id/clProfileView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvEvents"

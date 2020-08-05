@@ -31,6 +31,8 @@
 
         <activity android:name=".SignUpActivity" />
 
+        <activity android:name=".zoom.ZoomEmailLoginActivity" />
+
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

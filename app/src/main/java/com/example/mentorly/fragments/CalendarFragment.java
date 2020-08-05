@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +39,9 @@ import com.example.mentorly.EventsAdapter;
 import com.example.mentorly.R;
 import com.example.mentorly.models.DateInterval;
 import com.example.mentorly.models.MyEvent;
+import com.example.mentorly.zoom.InitAuthSDKCallback;
+import com.example.mentorly.zoom.ZoomEmailLoginActivity;
+import com.example.mentorly.zoom.ZoomInitAuthSDKHelper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -59,10 +63,16 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import us.zoom.sdk.AccountService;
+import us.zoom.sdk.MeetingItem;
+import us.zoom.sdk.PreMeetingService;
+import us.zoom.sdk.PreMeetingServiceListener;
+import us.zoom.sdk.ZoomSDK;
+
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 
-public class CalendarFragment extends Fragment implements AddEventDialogFragment.AddEventDialogFragmentListener {
+public class CalendarFragment extends Fragment implements AddEventDialogFragment.AddEventDialogFragmentListener, InitAuthSDKCallback {
 
     // Projection array. Creating indices for this array instead of doing
     // dynamic lookups improves performance.
@@ -100,6 +110,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     //views
     Button btnSignIn;
+    Button btnZoomSignIn;
     Button mSignOut;
     TextView mFullName;
     ImageView mProfileView;
@@ -114,6 +125,9 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     // collect list of event dates to pas to addEvent prediction
     List<DateInterval> eventDates;
 
+    // Zoom info
+    ZoomSDK mZoomSDK;
+    public static final int ZOOM_DURATION_MINUTES = 60;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -151,12 +165,17 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
         // Configure the layout views
         btnSignIn = view.findViewById(R.id.btnGoogleSignIn);
+        btnZoomSignIn = view.findViewById(R.id.btnZoomSignIn);
         mSignOut = view.findViewById(R.id.signOut);
         mFullName = view.findViewById(R.id.fullName);
         mProfileView = view.findViewById(R.id.profileImage);
         rvEvents = view.findViewById(R.id.rvEvents);
         fabAddEvent = view.findViewById(R.id.fabAddEvent);
         clProfileView = view.findViewById(R.id.clProfileView);
+
+        // Set up zoom SDK
+        mZoomSDK = ZoomSDK.getInstance();
+        ZoomInitAuthSDKHelper.getInstance().initSDK(getContext(), new ZoomInitAuthSDKHelper());
 
         // Set up the event recycler view
         eventDates = new ArrayList<>();
@@ -187,6 +206,16 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
         // Add spin animation on floating button when fragment is created
         animateFloatingActionButton();
+
+    }
+
+
+    @Override
+    public void onZoomSDKInitializeResult(int i, int i1) {
+    }
+
+    @Override
+    public void onZoomAuthIdentityExpired() {
     }
 
     // Class to define the offset height in recycler view
@@ -410,7 +439,8 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     // Method for adding and saving an event to calendar
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void addEvent(long calID, String title, String description, int[] startSelected, int[] endSelected, boolean sendInvite) {
+    private void addEvent(long calID, String title, String description, int[] startSelected,
+                          int[] endSelected, boolean sendInvite, boolean isZoomMeeting) {
         long startMillis = 0;
         long endMillis = 0;
         Calendar beginTime = null;
@@ -423,6 +453,62 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         endTime.set(endSelected[0], endSelected[1], endSelected[2], endSelected[3], endSelected[4]);
         endMillis = endTime.getTimeInMillis();
 
+        if (isZoomMeeting) {
+            PreMeetingService mPreMeetingService = null;
+            AccountService mAccountService;
+
+            // Check if the zoom account has ability to add new meeting
+            if (ZoomSDK.getInstance().isInitialized()) {
+                mAccountService = ZoomSDK.getInstance().getAccountService();
+                mPreMeetingService = ZoomSDK.getInstance().getPreMeetingService();
+                if (mAccountService == null || mPreMeetingService == null) {
+                    Toast.makeText(getContext(), "Couldn't create Zoom meeting", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            // Create the meeting item
+            MeetingItem meetingItem = mPreMeetingService.createScheduleMeetingItem();
+            meetingItem.setMeetingTopic(title);
+            meetingItem.setTimeZoneId(TimeZone.getDefault().toString());
+            meetingItem.setStartTime(beginTime.getTimeInMillis());
+            // Set the meeting to one hour
+            meetingItem.setDurationInMinutes(ZOOM_DURATION_MINUTES);
+
+            if (mPreMeetingService != null) {
+                mPreMeetingService.addListener(new PreMeetingServiceListener() {
+                    @Override
+                    public void onListMeeting(int i, List<Long> list) {
+                    }
+
+                    @Override
+                    public void onScheduleMeeting(int i, long l) {
+                    }
+
+                    @Override
+                    public void onUpdateMeeting(int i, long l) {
+                    }
+
+                    @Override
+                    public void onDeleteMeeting(int i) {
+                    }
+                });
+                PreMeetingService.ScheduleOrEditMeetingError error = mPreMeetingService.scheduleMeeting(meetingItem);
+                if (error == PreMeetingService.ScheduleOrEditMeetingError.SUCCESS) {
+                    Toast.makeText(getContext(), "Success", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "User not login.", Toast.LENGTH_LONG).show();
+            }
+
+            if (description != null) {
+                description += "\n Invited to Zoom meeting.";
+            } else {
+                description = "Invited to Zoom meeting.";
+            }
+        }
 
         ContentResolver crEvent = getContext().getContentResolver();
         ContentValues values = new ContentValues();
@@ -499,6 +585,8 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         if (account != null) {
             btnSignIn.setVisibility(View.GONE);
 
+            btnZoomSignIn.setVisibility(mZoomSDK.isLoggedIn() ? View.GONE : View.VISIBLE);
+
             fabAddEvent.setVisibility(View.VISIBLE);
             clProfileView.setVisibility(View.VISIBLE);
             String displayName = account.getDisplayName();
@@ -529,6 +617,20 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         showAddEventDialog();
                     }
+                }
+            });
+
+            btnZoomSignIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!mZoomSDK.isInitialized()) {
+                        Toast.makeText(getContext(), "Init SDK First", Toast.LENGTH_SHORT).show();
+                        ZoomInitAuthSDKHelper.getInstance().initSDK(getContext(), new ZoomInitAuthSDKHelper());
+                    }
+
+                    // Start intent for email login
+                    Intent intent = new Intent(getContext(), ZoomEmailLoginActivity.class);
+                    startActivity(intent);
                 }
             });
 
@@ -567,9 +669,10 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     }
 
     @Override
-    public void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected, boolean sendInvite) {
+    public void onFinishAddEventDialog(String title, String description, int[] startSelected,
+                                       int[] endSelected, boolean sendInvite, boolean isZoomMeeting) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            addEvent(calendarId, title, description, startSelected, endSelected, sendInvite);
+            addEvent(calendarId, title, description, startSelected, endSelected, sendInvite, isZoomMeeting);
         }
         refreshFragment();
     }

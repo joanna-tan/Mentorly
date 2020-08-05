@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ public class AddEventDialogFragment extends DialogFragment {
     private EditText etTimePick;
     private EditText etEndTimePick;
     private TextView tvAutofillTime;
+    private CheckBox isZoomMeeting;
 
     // format: YYYY, MM, DD, HH, MM
     int[] startSelected;
@@ -92,6 +94,7 @@ public class AddEventDialogFragment extends DialogFragment {
         etEventTitle = view.findViewById(R.id.etEventTitle);
         etEventBody = view.findViewById(R.id.etEventBody);
         tvAutofillTime = view.findViewById(R.id.tvAutofillEvent);
+        isZoomMeeting = view.findViewById(R.id.checkIsZoom);
 
         // initialize data arrays
         startSelected = new int[5];
@@ -346,7 +349,8 @@ public class AddEventDialogFragment extends DialogFragment {
 
     // Defines the listener interface
     public interface AddEventDialogFragmentListener {
-        void onFinishAddEventDialog(String title, String description, int[] startSelected, int[] endSelected, boolean sendInvite);
+        void onFinishAddEventDialog(String title, String description,
+                                    int[] startSelected, int[] endSelected, boolean sendInvite, boolean isZoomMeeting);
 
     }
 
@@ -354,9 +358,11 @@ public class AddEventDialogFragment extends DialogFragment {
     public void sendBackResult(boolean sendEmailInvite) {
         AddEventDialogFragmentListener listener = (AddEventDialogFragmentListener) getTargetFragment();
         if (etEventBody.getText().toString().isEmpty()) {
-            listener.onFinishAddEventDialog(etEventTitle.getText().toString(), null, startSelected, endSelected, sendEmailInvite);
+            listener.onFinishAddEventDialog(etEventTitle.getText().toString(),
+                    null, startSelected, endSelected, sendEmailInvite, isZoomMeeting.isChecked());
         } else {
-            listener.onFinishAddEventDialog(etEventTitle.getText().toString(), etEventBody.getText().toString(), startSelected, endSelected, sendEmailInvite);
+            listener.onFinishAddEventDialog(etEventTitle.getText().toString(),
+                    etEventBody.getText().toString(), startSelected, endSelected, sendEmailInvite, isZoomMeeting.isChecked());
         }
         dismiss();
     }
