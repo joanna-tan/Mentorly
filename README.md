@@ -145,4 +145,3 @@ Optional:
 <img src='camera_todo.gif'/>
 <img src='create_event_zoom.gif'/>
 <img src='adding_events_all.gif'/>
-<img src='event_invite.gif'/>
