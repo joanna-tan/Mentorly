@@ -138,10 +138,23 @@ Optional:
     `GET`    | /users/me/calendarList/calendarId  | retrieve all calendars for the current user
     
 ## Walkthroughs
+### General layout
 <img src='general_layout_v2.gif'/>
+
+### Registering a new user
 <img src='register_walkthrough.gif'/>
+
+### Sending pair requests
 <img src='pair_req.gif'/>
+
+### Live chat & bookmarks
 <img src='chat_updated.gif'/>
+
+### Update profile picture & add ToDo item
 <img src='camera_todo.gif'/>
+
+### Login and create Zoom event
 <img src='create_event_zoom.gif'/>
+
+### General event creation
 <img src='adding_events_all.gif'/>
