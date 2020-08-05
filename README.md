@@ -141,7 +141,7 @@ Optional:
 <img src='general_layout_v2.gif'/>
 <img src='register_walkthrough.gif'/>
 <img src='pair_req.gif'/>
-<img src='live_chat.gif'/>
+<img src='chat_updated.gif'/>
 <img src='camera_todo.gif'/>
 <img src='create_event_zoom.gif'/>
 <img src='adding_events_all.gif'/>
