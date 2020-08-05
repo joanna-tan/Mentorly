@@ -139,10 +139,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    if (savedByUser.getUsername().equals(currentUser.getUsername())) {
-                        isSaved = true;
-                    }
+                    isSaved = savedByUser.getUsername().equals(currentUser.getUsername());
                 }
+            }
+            else {
+                isSaved = false;
             }
 
 

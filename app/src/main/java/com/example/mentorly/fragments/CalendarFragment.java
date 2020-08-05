@@ -439,8 +439,8 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
     // Method for adding and saving an event to calendar
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void addEvent(long calID, String title, String description, int[] startSelected,
-                          int[] endSelected, boolean sendInvite, boolean isZoomMeeting) {
+    private void addEvent(final long calID, final String title, String description, int[] startSelected,
+                          int[] endSelected, final boolean sendInvite, boolean isZoomMeeting) {
         long startMillis = 0;
         long endMillis = 0;
         Calendar beginTime = null;
@@ -462,7 +462,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                 mAccountService = ZoomSDK.getInstance().getAccountService();
                 mPreMeetingService = ZoomSDK.getInstance().getPreMeetingService();
                 if (mAccountService == null || mPreMeetingService == null) {
-                    Toast.makeText(getContext(), "Couldn't create Zoom meeting", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Couldn't create meeting", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
@@ -475,14 +475,26 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             // Set the meeting to one hour
             meetingItem.setDurationInMinutes(ZOOM_DURATION_MINUTES);
 
+
             if (mPreMeetingService != null) {
+                final PreMeetingService finalMPreMeetingService = mPreMeetingService;
+                final long finalStartMillis = startMillis;
+                final long finalEndMillis = endMillis;
+                final String finalDescription = description;
                 mPreMeetingService.addListener(new PreMeetingServiceListener() {
                     @Override
                     public void onListMeeting(int i, List<Long> list) {
                     }
 
                     @Override
-                    public void onScheduleMeeting(int i, long l) {
+                    public void onScheduleMeeting(int i, long meetingUniqueId) {
+                        MeetingItem item = finalMPreMeetingService.getMeetingItemByUniqueId(meetingUniqueId);
+                        // Save the invitation content and cut if description is null
+                        String newDescription = finalDescription == null ? item.getInvitationEmailContentWithTime() :
+                        finalDescription + "\n" + item.getInvitationEmailContentWithTime();
+                        // Call method to continue creating event in GCal
+                        continueSavingNewEvent(calID, title, newDescription, finalStartMillis, finalEndMillis, sendInvite);
+                        refreshFragment();
                     }
 
                     @Override
@@ -494,22 +506,23 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                     }
                 });
                 PreMeetingService.ScheduleOrEditMeetingError error = mPreMeetingService.scheduleMeeting(meetingItem);
+
                 if (error == PreMeetingService.ScheduleOrEditMeetingError.SUCCESS) {
                     Toast.makeText(getContext(), "Success", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(getContext(), "User not login.", Toast.LENGTH_LONG).show();
-            }
-
-            if (description != null) {
-                description += "\n Invited to Zoom meeting.";
-            } else {
-                description = "Invited to Zoom meeting.";
+                Toast.makeText(getContext(), "User not logged in.", Toast.LENGTH_LONG).show();
             }
         }
+        // If meeting is not Zoom meeting then save it normally in GCal
+        else {
+            continueSavingNewEvent(calID, title, description, startMillis, endMillis, sendInvite);
+        }
+    }
 
+    private void continueSavingNewEvent(long calID, String title, String description, long startMillis, long endMillis, boolean sendInvite) {
         ContentResolver crEvent = getContext().getContentResolver();
         ContentValues values = new ContentValues();
         values.put(CalendarContract.Events.DTSTART, startMillis);
@@ -549,7 +562,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             crAttendee.insert(CalendarContract.Attendees.CONTENT_URI, values);
             Snackbar.make(getView(), "Event created", Snackbar.LENGTH_SHORT).
                     setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
-
         }
     }
 

@@ -139,7 +139,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
             String monthNumber = (String) DateFormat.format("MM", date); // 06
             String year = (String) DateFormat.format("yyyy", date); // 2013
             String dueString = monthNumber + "/" + day + "/" + year;
-            tvEventStart.setText("Due: " + dueString);
+            tvEventStart.setText("Start: " + dueString);
 
             icon.setImageResource(R.drawable.ic_outline_calendar_today_24);
         }
