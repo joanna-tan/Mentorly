@@ -54,10 +54,11 @@ public class AddEventDialogFragment extends DialogFragment {
     public AddEventDialogFragment() {
     }
 
-    public static AddEventDialogFragment newInstance(List<DateInterval> eventDates) {
+    public static AddEventDialogFragment newInstance(List<DateInterval> eventDates, boolean loggedIn) {
         AddEventDialogFragment frag = new AddEventDialogFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList("dates", (ArrayList<? extends Parcelable>) eventDates);
+        args.putBoolean("isZoomLoggedIn", loggedIn);
         frag.setArguments(args);
         return frag;
     }
@@ -77,13 +78,13 @@ public class AddEventDialogFragment extends DialogFragment {
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
-
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final List<DateInterval> eventDates = getArguments().getParcelableArrayList("dates");
+        boolean isZoomLoggedIn = getArguments().getBoolean("isZoomLoggedIn");
 
         // set the views
         btnSubmitAndInvite = view.findViewById(R.id.btnSubmitEvent);
@@ -95,6 +96,9 @@ public class AddEventDialogFragment extends DialogFragment {
         etEventBody = view.findViewById(R.id.etEventBody);
         tvAutofillTime = view.findViewById(R.id.tvAutofillEvent);
         isZoomMeeting = view.findViewById(R.id.checkIsZoom);
+
+        // Display Zoom checkbox if logged in, empty if not
+        isZoomMeeting.setVisibility(isZoomLoggedIn ? View.VISIBLE : View.GONE);
 
         // initialize data arrays
         startSelected = new int[5];

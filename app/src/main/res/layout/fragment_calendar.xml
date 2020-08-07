@@ -6,11 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".fragments.ToDoFragment">
+    tools:context=".fragments.CalendarFragment">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/clCalendarLayout"
+        >
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,8 +37,20 @@
                 android:id="@+id/btnZoomSignIn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:text="Sign in to Zoom"
                 android:visibility="gone"
-                android:text="Sign in with Zoom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/signOut"
+                app:layout_constraintBottom_toBottomOf="@id/signOut"
+                app:layout_constraintStart_toEndOf="@id/signOut"
+                />
+
+            <Button
+                android:id="@+id/btnZoomSignOut"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="Sign out of Zoom"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/signOut"
                 app:layout_constraintBottom_toBottomOf="@id/signOut"

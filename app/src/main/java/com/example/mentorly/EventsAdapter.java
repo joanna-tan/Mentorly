@@ -96,7 +96,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
         public void bind(MyEvent event) {
             tvTitleEvent.setText(event.getEventTitle());
             // if the description has text & attendees, show the drop down arrow
-            if (event.getEventDescription() != null && !event.getEventDescription().equals("") && event.getAttendees() != null) {
+            if (event.getEventDescription() != null && !event.getEventDescription().equals("") && event.getAttendees() != null
+                    && !event.getAttendees().isEmpty()) {
                 eventDescription.setVisibility(View.VISIBLE);
                 ivEventDropDown.setVisibility(View.VISIBLE);
                 eventAttendees.setVisibility(View.VISIBLE);

@@ -1,6 +1,8 @@
 package com.example.mentorly.zoom;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,18 +13,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.mentorly.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import us.zoom.sdk.ZoomApiError;
 import us.zoom.sdk.ZoomAuthenticationError;
 
 public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLoginCallback.ZoomDemoAuthenticationListener, View.OnClickListener, InitAuthSDKCallback {
 
-    private final static String TAG = "ZoomSDK";
-
     private EditText mEdtUserName;
     private EditText mEdtPassord;
     private Button mBtnLogin;
     private View mProgressPanel;
+    private String username;
+    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +44,19 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
 
         mEdtUserName = (EditText)findViewById(R.id.userName);
         mEdtPassord = (EditText)findViewById(R.id.password);
-
         mBtnLogin = (Button)findViewById(R.id.btnLogin);
         mBtnLogin.setOnClickListener(this);
-
         mProgressPanel = (View)findViewById(R.id.progressPanel);
+
+        // Try to log in with previous data
+        SharedPreferences pref =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String username = pref.getString("username", "n/a");
+        String password = pref.getString("password", "n/a");
+        mEdtUserName.setText(username);
+        mEdtPassord.setText(password);
+        tryZoomLogin(username, password);
+
     }
 
     @Override
@@ -77,6 +88,10 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
             return;
         }
 
+        tryZoomLogin(userName, password);
+    }
+
+    private void tryZoomLogin(String userName, String password) {
         int ret=ZoomLoginHelper.getInstance().login(userName, password);
         if(!(ret== ZoomApiError.ZOOM_API_ERROR_SUCCESS)) {
             if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED) {
@@ -87,14 +102,26 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
         } else {
             mBtnLogin.setVisibility(View.GONE);
             mProgressPanel.setVisibility(View.VISIBLE);
+            this.username = userName;
+            this.password = password;
         }
     }
 
     @Override
     public void onZoomSDKLoginResult(long result) {
         if(result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS) {
-            Toast.makeText(this, "Zoom login success", Toast.LENGTH_SHORT).show();
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.layoutZoomSignIn), "Logged in to Zoom", Snackbar.LENGTH_SHORT);
+            snackbar.setAnchorView(findViewById(R.id.bottomNavigation)).show();
+
+//            Toast.makeText(this, "Zoom login success", Toast.LENGTH_SHORT).show();
             UserLoginCallback.getInstance().removeListener(this);
+
+            SharedPreferences pref =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor edit = pref.edit();
+            edit.putString("username", username);
+            edit.putString("password", password);
+            edit.commit();
             finish();
         } else {
             Toast.makeText(this, "Login failed result code = " + result, Toast.LENGTH_SHORT).show();

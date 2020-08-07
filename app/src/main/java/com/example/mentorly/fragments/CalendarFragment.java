@@ -27,6 +27,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -83,12 +84,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             CalendarContract.Calendars.OWNER_ACCOUNT                  // 3
     };
 
-    // The indices for the projection array above.
-    private static final int PROJECTION_ID_INDEX = 0;
-    private static final int PROJECTION_ACCOUNT_NAME_INDEX = 1;
-    private static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
-    private static final int PROJECTION_OWNER_ACCOUNT_INDEX = 3;
-
     // Check for calendar permissions
     boolean permissionsGranted;
 
@@ -111,6 +106,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
     //views
     Button btnSignIn;
     Button btnZoomSignIn;
+    Button btnZoomSignOut;
     Button mSignOut;
     TextView mFullName;
     ImageView mProfileView;
@@ -166,6 +162,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         // Configure the layout views
         btnSignIn = view.findViewById(R.id.btnGoogleSignIn);
         btnZoomSignIn = view.findViewById(R.id.btnZoomSignIn);
+        btnZoomSignOut = view.findViewById(R.id.btnZoomSignOut);
         mSignOut = view.findViewById(R.id.signOut);
         mFullName = view.findViewById(R.id.fullName);
         mProfileView = view.findViewById(R.id.profileImage);
@@ -206,7 +203,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
         // Add spin animation on floating button when fragment is created
         animateFloatingActionButton();
-
     }
 
 
@@ -315,15 +311,8 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         // Use the cursor to step through the returned records
         while (cur.moveToNext()) {
             long calID = 0;
-            String displayName = null;
-            String accountName = null;
-            String ownerName = null;
-
             // Get the field values
-            calID = cur.getLong(PROJECTION_ID_INDEX);
-            displayName = cur.getString(PROJECTION_DISPLAY_NAME_INDEX);
-            accountName = cur.getString(PROJECTION_ACCOUNT_NAME_INDEX);
-            ownerName = cur.getString(PROJECTION_OWNER_ACCOUNT_INDEX);
+            calID = cur.getLong(0);
 
             checkEvents(calID);
             calendarId = calID;
@@ -374,11 +363,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
                         allEvents.add(event);
                         adapter.notifyDataSetChanged();
-                        Log.i(TAG, "Event id: " + eventId);
-                        Log.i(TAG, "Event title: " + title);
-                        Log.i(TAG, "Description: " + description);
-                        Log.i(TAG, "Event start: " + begin);
-                        Log.i(TAG, "Event end: " + end);
                     }
                 }
                 while (cur.moveToNext());
@@ -491,7 +475,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                         MeetingItem item = finalMPreMeetingService.getMeetingItemByUniqueId(meetingUniqueId);
                         // Save the invitation content and cut if description is null
                         String newDescription = finalDescription == null ? item.getInvitationEmailContentWithTime() :
-                        finalDescription + "\n" + item.getInvitationEmailContentWithTime();
+                                finalDescription + "\n" + item.getInvitationEmailContentWithTime();
                         // Call method to continue creating event in GCal
                         continueSavingNewEvent(calID, title, newDescription, finalStartMillis, finalEndMillis, sendInvite);
                         refreshFragment();
@@ -597,8 +581,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         if (account != null) {
             btnSignIn.setVisibility(View.GONE);
 
-            btnZoomSignIn.setVisibility(mZoomSDK.isLoggedIn() ? View.GONE : View.VISIBLE);
-
             fabAddEvent.setVisibility(View.VISIBLE);
             clProfileView.setVisibility(View.VISIBLE);
             String displayName = account.getDisplayName();
@@ -632,6 +614,28 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                 }
             });
 
+            // Reveal and configure sign out button
+            if (mSignOut.getVisibility() == View.GONE) {
+                mSignOut.setVisibility(View.VISIBLE);
+                mSignOut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        googleSignOut();
+                    }
+                });
+            }
+
+            // Show Zoom sign-in option only if user is also Google authenticated
+            handleZoomSignIn();
+        }
+    }
+
+    private void handleZoomSignIn() {
+        if (!mZoomSDK.isLoggedIn()) {
+            // Hide the sign out UI until user is authenticated by Zoom
+            btnZoomSignIn.setVisibility(View.VISIBLE);
+            btnZoomSignOut.setVisibility(View.GONE);
+
             btnZoomSignIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -645,18 +649,45 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                     startActivity(intent);
                 }
             });
-
-            // Reveal and configure sign out button
-            if (mSignOut.getVisibility() == View.GONE) {
-                mSignOut.setVisibility(View.VISIBLE);
-                mSignOut.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        googleSignOut();
-                    }
-                });
-            }
         }
+
+        // Reveal and configure zoom sign out if zoom authenticated
+        else if (btnZoomSignOut.getVisibility() == View.GONE && mZoomSDK.isLoggedIn()) {
+            btnZoomSignOut.setVisibility(View.VISIBLE);
+            btnZoomSignIn.setVisibility(View.GONE);
+
+            btnZoomSignOut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!mZoomSDK.logoutZoom()) {
+                        Toast.makeText(getContext(), "ZoomSDK has not been initialized successfully", Toast.LENGTH_LONG).show();
+                    } else {
+                        refreshFragment();
+                    }
+                }
+            });
+
+            // Reset the constraint params for Google sign out button if the user is zoom logged in
+            ConstraintLayout constraintLayout = getView().findViewById(R.id.clEvents);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+            constraintSet.connect(R.id.signOut, ConstraintSet.END, R.id.btnZoomSignOut, ConstraintSet.START, 0);
+            constraintSet.applyTo(constraintLayout);
+            btnZoomSignOut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ZoomSDK zoomSDK = ZoomSDK.getInstance();
+                    if (!zoomSDK.logoutZoom()) {
+                        Toast.makeText(getContext(), "ZoomSDK has not been initialized successfully", Toast.LENGTH_LONG).show();
+                    } else {
+                        Snackbar snackbar = Snackbar.make(getView(), "Signed out of Zoom", Snackbar.LENGTH_SHORT);
+                        snackbar.setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
+                        refreshFragment();
+                    }
+                }
+            });
+        }
+
     }
 
     public void googleSignOut() {
@@ -669,12 +700,15 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                         refreshFragment();
                     }
                 });
+        mZoomSDK.logoutZoom();
+        btnZoomSignOut.setVisibility(View.GONE);
+        btnZoomSignIn.setVisibility(View.GONE);
     }
 
     // Show a dialog to request user input on new event
     private void showAddEventDialog() {
         FragmentManager fm = getParentFragmentManager();
-        AddEventDialogFragment addEventDialogFragment = AddEventDialogFragment.newInstance(eventDates);
+        AddEventDialogFragment addEventDialogFragment = AddEventDialogFragment.newInstance(eventDates, mZoomSDK.isLoggedIn());
         // Set the calendar fragment for use later when sending event back
         addEventDialogFragment.setTargetFragment(CalendarFragment.this, 300);
         addEventDialogFragment.show(fm, "fragment_add_event");
@@ -687,6 +721,14 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             addEvent(calendarId, title, description, startSelected, endSelected, sendInvite, isZoomMeeting);
         }
         refreshFragment();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Resume is called when the zoom login activity is finished
+        handleZoomSignIn();
     }
 
     // Method to refresh the fragment view when an action has been performed

@@ -136,7 +136,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
                 adapter.notifyDataSetChanged();
 
                 // show a Snackbar for the user to un-delete the To Do item
-                Snackbar.make(getView(), "Deleted Saved Selection.", Snackbar.LENGTH_LONG).
+                Snackbar.make(getView(), "Deleted To Do item.", Snackbar.LENGTH_LONG).
                         setAction("Undo", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
