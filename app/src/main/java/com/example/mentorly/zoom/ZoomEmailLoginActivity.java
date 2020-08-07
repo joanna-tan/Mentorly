@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.mentorly.R;
-import com.google.android.material.snackbar.Snackbar;
 
 import us.zoom.sdk.ZoomApiError;
 import us.zoom.sdk.ZoomAuthenticationError;
@@ -51,8 +50,8 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
         // Try to log in with previous data
         SharedPreferences pref =
                 PreferenceManager.getDefaultSharedPreferences(this);
-        String username = pref.getString("username", "n/a");
-        String password = pref.getString("password", "n/a");
+        String username = pref.getString("username", "");
+        String password = pref.getString("password", "");
         mEdtUserName.setText(username);
         mEdtPassord.setText(password);
         tryZoomLogin(username, password);
@@ -95,9 +94,7 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
         int ret=ZoomLoginHelper.getInstance().login(userName, password);
         if(!(ret== ZoomApiError.ZOOM_API_ERROR_SUCCESS)) {
             if (ret == ZoomApiError.ZOOM_API_ERROR_EMAIL_LOGIN_IS_DISABLED) {
-                Toast.makeText(this, "Account had disable email login ", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "ZoomSDK has not been initialized successfully or sdk is logging in.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Account has disabled email login ", Toast.LENGTH_LONG).show();
             }
         } else {
             mBtnLogin.setVisibility(View.GONE);
@@ -110,10 +107,6 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
     @Override
     public void onZoomSDKLoginResult(long result) {
         if(result == ZoomAuthenticationError.ZOOM_AUTH_ERROR_SUCCESS) {
-            Snackbar snackbar = Snackbar.make(findViewById(R.id.layoutZoomSignIn), "Logged in to Zoom", Snackbar.LENGTH_SHORT);
-            snackbar.setAnchorView(findViewById(R.id.bottomNavigation)).show();
-
-//            Toast.makeText(this, "Zoom login success", Toast.LENGTH_SHORT).show();
             UserLoginCallback.getInstance().removeListener(this);
 
             SharedPreferences pref =
@@ -122,6 +115,7 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
             edit.putString("username", username);
             edit.putString("password", password);
             edit.commit();
+
             finish();
         } else {
             Toast.makeText(this, "Login failed result code = " + result, Toast.LENGTH_SHORT).show();

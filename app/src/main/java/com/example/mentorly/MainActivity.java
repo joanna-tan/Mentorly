@@ -1,8 +1,10 @@
 package com.example.mentorly;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -27,6 +29,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.parse.ParseUser;
+
+import us.zoom.sdk.ZoomSDK;
 
 import static com.example.mentorly.fragments.CalendarFragment.RC_SIGN_IN;
 
@@ -149,6 +153,17 @@ public class MainActivity extends AppCompatActivity {
                 build();
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
         googleSignInClient.signOut();
+
+        // Log out the zoom user
+        ZoomSDK zoomSDK = ZoomSDK.getInstance();
+        zoomSDK.logoutZoom();
+
+        // Clear the stored Zoom username and password
+        SharedPreferences pref =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor edit = pref.edit();
+        edit.clear();
+        edit.commit();
 
         // Send user to loginActivity
         Intent i = new Intent(this, LoginActivity.class);

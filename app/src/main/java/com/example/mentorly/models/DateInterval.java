@@ -111,9 +111,17 @@ public class DateInterval implements Parcelable {
     // Return true if the time interval ends after HOUR_END_OF_DAY
     @RequiresApi(api = Build.VERSION_CODES.N)
     public boolean isEndOfDay () {
-        Calendar endTime = Calendar.getInstance();
-        endTime.setTime(end);
-        return endTime.get(Calendar.HOUR_OF_DAY) >= HOUR_END_OF_DAY;
+        Calendar startTime = Calendar.getInstance();
+        startTime.setTime(start);
+        return startTime.get(Calendar.HOUR_OF_DAY) >= HOUR_END_OF_DAY;
+    }
+
+    // Return true if the time interval starts before HOUR_START_OF_DAY
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public boolean isBeforeStartOfDay () {
+        Calendar startTime = Calendar.getInstance();
+        startTime.setTime(start);
+        return startTime.get(Calendar.HOUR_OF_DAY) <= HOUR_START_OF_DAY;
     }
 
     // Reset the interval to the input start time to +1 hour

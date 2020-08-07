@@ -294,7 +294,7 @@ public class AddEventDialogFragment extends DialogFragment {
         // Change the event time by one hour if an overlap occurs
         for (DateInterval interval : eventTimes) {
             // If the time is set to after 6pm, shift to tomorrow at 8am
-            if (newInterval.isEndOfDay()) {
+            if (newInterval.isEndOfDay() || newInterval.isBeforeStartOfDay()) {
                 newInterval.shiftToStartOfDay();
             }
             // If the time overlaps, move it by one hour
@@ -310,7 +310,7 @@ public class AddEventDialogFragment extends DialogFragment {
 
             for (DateInterval interval : eventTimes) {
                 // If the time is set to after 6pm, shift to tomorrow at 8am
-                if (newInterval.isEndOfDay()) {
+                if (newInterval.isEndOfDay() || newInterval.isBeforeStartOfDay()) {
                     newInterval.shiftToStartOfDay();
                 }
                 // If the time overlaps, move it by 30 minutes

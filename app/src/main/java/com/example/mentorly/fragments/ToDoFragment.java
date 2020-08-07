@@ -136,16 +136,17 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
                 adapter.notifyDataSetChanged();
 
                 // show a Snackbar for the user to un-delete the To Do item
-                Snackbar.make(getView(), "Deleted To Do item.", Snackbar.LENGTH_LONG).
-                        setAction("Undo", new View.OnClickListener() {
+                Snackbar.make(view.findViewById(R.id.btnAddToDo), "Deleted ToDo item", Snackbar.LENGTH_SHORT).
+                        setAnchorView(view.findViewById(R.id.bottomNavigation))
+                        .setAction("Undo", new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                newItem.saveInBackground();
-                                items.add(itemPosition, newItem);
-                                adapter.notifyDataSetChanged();
+                            public void onClick(View view) {
+                                    newItem.saveInBackground();
+                                    items.add(itemPosition, newItem);
+                                    adapter.notifyDataSetChanged();
                             }
-
-                        }).show();
+                        })
+                        .show();
             }
 
             @Override

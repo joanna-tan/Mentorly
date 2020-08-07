@@ -205,7 +205,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         animateFloatingActionButton();
     }
 
-
     @Override
     public void onZoomSDKInitializeResult(int i, int i1) {
     }
@@ -478,7 +477,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                                 finalDescription + "\n" + item.getInvitationEmailContentWithTime();
                         // Call method to continue creating event in GCal
                         continueSavingNewEvent(calID, title, newDescription, finalStartMillis, finalEndMillis, sendInvite);
-                        refreshFragment();
                     }
 
                     @Override
@@ -506,6 +504,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void continueSavingNewEvent(long calID, String title, String description, long startMillis, long endMillis, boolean sendInvite) {
         ContentResolver crEvent = getContext().getContentResolver();
         ContentValues values = new ContentValues();
@@ -527,25 +526,24 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         if (sendInvite) {
             addAttendee(eventID);
         }
+
+        // Update the adapter with the new event
+        checkCalendars();
+        adapter.notifyDataSetChanged();
+        Snackbar.make(getView().findViewById(R.id.fabAddEvent), "Event created", Snackbar.LENGTH_SHORT).
+                setAnchorView(getView().findViewById(R.id.bottomNavigation))
+                .show();
     }
 
     private void addAttendee(long eventID) {
         ContentResolver crAttendee = getContext().getContentResolver();
         ContentValues values = new ContentValues();
-        if (pairPartner == null) {
-            Snackbar.make(getView(), "Event created, no invites sent", Snackbar.LENGTH_SHORT).
-                    setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
-        } else if (pairEmail == null) {
-            Snackbar.make(getView(), "Event created, partner does not have email invite", Snackbar.LENGTH_SHORT).
-                    setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
-        }
+
         // If partner has valid email, add their email as an attendee
-        else {
+        if (pairPartner != null && pairEmail != null) {
             values.put(CalendarContract.Attendees.ATTENDEE_EMAIL, pairEmail);
             values.put(CalendarContract.Attendees.EVENT_ID, eventID);
             crAttendee.insert(CalendarContract.Attendees.CONTENT_URI, values);
-            Snackbar.make(getView(), "Event created", Snackbar.LENGTH_SHORT).
-                    setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
         }
     }
 
@@ -584,7 +582,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             fabAddEvent.setVisibility(View.VISIBLE);
             clProfileView.setVisibility(View.VISIBLE);
             String displayName = account.getDisplayName();
-            Uri imageUrl = account.getPhotoUrl();
+            final Uri imageUrl = account.getPhotoUrl();
 
             if (displayName != null) mFullName.setText(displayName);
             Glide.with(getContext())
@@ -636,6 +634,13 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             btnZoomSignIn.setVisibility(View.VISIBLE);
             btnZoomSignOut.setVisibility(View.GONE);
 
+            // Reset the constraint params for Google sign in button
+            ConstraintLayout constraintLayout = getView().findViewById(R.id.clEvents);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+            constraintSet.connect(R.id.signOut, ConstraintSet.END, R.id.btnZoomSignIn, ConstraintSet.START, 0);
+            constraintSet.applyTo(constraintLayout);
+
             btnZoomSignIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -656,17 +661,6 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             btnZoomSignOut.setVisibility(View.VISIBLE);
             btnZoomSignIn.setVisibility(View.GONE);
 
-            btnZoomSignOut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!mZoomSDK.logoutZoom()) {
-                        Toast.makeText(getContext(), "ZoomSDK has not been initialized successfully", Toast.LENGTH_LONG).show();
-                    } else {
-                        refreshFragment();
-                    }
-                }
-            });
-
             // Reset the constraint params for Google sign out button if the user is zoom logged in
             ConstraintLayout constraintLayout = getView().findViewById(R.id.clEvents);
             ConstraintSet constraintSet = new ConstraintSet();
@@ -676,13 +670,14 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             btnZoomSignOut.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ZoomSDK zoomSDK = ZoomSDK.getInstance();
-                    if (!zoomSDK.logoutZoom()) {
+                    if (!mZoomSDK.logoutZoom()) {
                         Toast.makeText(getContext(), "ZoomSDK has not been initialized successfully", Toast.LENGTH_LONG).show();
                     } else {
-                        Snackbar snackbar = Snackbar.make(getView(), "Signed out of Zoom", Snackbar.LENGTH_SHORT);
-                        snackbar.setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
-                        refreshFragment();
+                        // show a Snackbar for the user to un-delete the To Do item
+                        Snackbar.make(getView().findViewById(R.id.fabAddEvent), "Signed out of Zoom", Snackbar.LENGTH_SHORT).
+                                setAnchorView(view.findViewById(R.id.bottomNavigation))
+                                .show();
+                        handleZoomSignIn();
                     }
                 }
             });
@@ -695,14 +690,14 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Snackbar snackbar = Snackbar.make(getView(), "Signed out", Snackbar.LENGTH_SHORT);
-                        snackbar.setAnchorView(getActivity().findViewById(R.id.bottomNavigation)).show();
+                        Snackbar.make(getView().findViewById(R.id.fabAddEvent), "Signed out of Google", Snackbar.LENGTH_SHORT).
+                                setAnchorView(getView().findViewById(R.id.bottomNavigation))
+                                .show();
                         refreshFragment();
                     }
                 });
         mZoomSDK.logoutZoom();
-        btnZoomSignOut.setVisibility(View.GONE);
-        btnZoomSignIn.setVisibility(View.GONE);
+        handleZoomSignIn();
     }
 
     // Show a dialog to request user input on new event
@@ -720,15 +715,14 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             addEvent(calendarId, title, description, startSelected, endSelected, sendInvite, isZoomMeeting);
         }
-        refreshFragment();
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        // Resume is called when the zoom login activity is finished
-        handleZoomSignIn();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+        updateUI(account);
     }
 
     // Method to refresh the fragment view when an action has been performed
