@@ -31,9 +31,9 @@ Integrated platform for building and sustaining 1:1 mentoring relationships.
    * Use OAuth login to send requests to Calendar API
 * Mentor/mentee exclusive chat window
 * Algorithm to suggest a potential meeting time
-* Bottom navigation for switching between chat/calendar/ToDo view
-* Animation on ToDo items or chat messages
-* Double tap gesture recognition on ToDo or message (likes)
+* Bottom navigation for switching between chat/calendar/ToDo view/profile
+* Animation on ToDo and Calendar floating action button
+* Swipe gesture recognition on ToDo to delete
 
 **Optional Nice-to-have Stories**
 
@@ -138,9 +138,23 @@ Optional:
     `GET`    | /users/me/calendarList/calendarId  | retrieve all calendars for the current user
     
 ## Walkthroughs
-<img src='general_layout_v1.gif'/>
+### General layout
+<img src='general_layout_v2.gif'/>
+
+### Registering a new user
 <img src='register_walkthrough.gif'/>
+
+### Sending pair requests
 <img src='pair_req.gif'/>
-<img src='live_chat.gif'/>
+
+### Live chat & bookmarks
+<img src='chat_updated.gif'/>
+
+### Update profile picture & add ToDo item
 <img src='camera_todo.gif'/>
-<img src='event_invite.gif'/>
+
+### Login and create Zoom event
+<img src='create_event_zoom.gif'/>
+
+### General event creation
+<img src='adding_events_all.gif'/>
