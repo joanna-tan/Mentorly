@@ -76,4 +76,6 @@
     <string name="no">No</string>
     <string name="toolbar_title">Toolbar Title</string>
     <string name="bookmarks">Bookmarks</string>
+    <string name="preview">Preview</string>
+    <string name="try_again_capture">Try again</string>
 </resources>

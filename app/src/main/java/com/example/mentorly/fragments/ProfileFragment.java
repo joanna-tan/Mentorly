@@ -30,11 +30,11 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.livequery.ParseLiveQueryClient;
+import com.parse.livequery.SubscriptionHandling;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class ProfileFragment extends Fragment implements AddPictureDialog.AddPictureDialogListener, EditMentorDialogFragment.EditMentorDialogListener {
 
@@ -199,7 +199,7 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
             if (sendingUserProfileImage != null) {
                 GlideApp.with(getContext())
                         .load(sendingUserProfileImage.getUrl())
-                        .transform(new RoundedCornersTransformation(50, 20))
+                        .apply(RequestOptions.circleCropTransform())
                         .into(ivPairProfileImage);
             } else {
                 ivPairProfileImage.setImageResource(R.drawable.ic_baseline_person_24);
@@ -254,6 +254,41 @@ public class ProfileFragment extends Fragment implements AddPictureDialog.AddPic
                 }
             });
         }
+
+        ParseLiveQueryClient parseLiveQueryClient = ParseLiveQueryClient.Factory.getClient();
+
+        ParseQuery<PairRequest> parseQuery = ParseQuery.getQuery(PairRequest.class);
+
+        // Connect to Parse server
+        SubscriptionHandling<PairRequest> subscriptionHandling = parseLiveQueryClient.subscribe(parseQuery);
+        // Listen for CREATE events
+        subscriptionHandling.handleEvent(SubscriptionHandling.Event.CREATE, new
+                SubscriptionHandling.HandleEventCallback<PairRequest>() {
+                    @Override
+                    public void onEvent(ParseQuery<PairRequest> query, PairRequest object) {
+                        refreshFragment();
+                    }
+                });
+
+        SubscriptionHandling<PairRequest> subscriptionHandlingUpdate = parseLiveQueryClient.subscribe(parseQuery);
+        // Listen for UPDATE events
+        subscriptionHandlingUpdate.handleEvent(SubscriptionHandling.Event.UPDATE, new
+                SubscriptionHandling.HandleEventCallback<PairRequest>() {
+                    @Override
+                    public void onEvent(ParseQuery<PairRequest> query, PairRequest object) {
+                        refreshFragment();
+                    }
+                });
+
+        SubscriptionHandling<PairRequest> subscriptionHandlingDelete = parseLiveQueryClient.subscribe(parseQuery);
+        // Listen for UPDATE events
+        subscriptionHandlingDelete.handleEvent(SubscriptionHandling.Event.DELETE, new
+                SubscriptionHandling.HandleEventCallback<PairRequest>() {
+                    @Override
+                    public void onEvent(ParseQuery<PairRequest> query, PairRequest object) {
+                        refreshFragment();
+                    }
+                });
     }
 
     // Bring up the add picture fragment

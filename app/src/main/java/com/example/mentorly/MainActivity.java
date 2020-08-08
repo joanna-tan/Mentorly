@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         // Tie DrawerLayout events to the ActionBarToggle
         mDrawer.addDrawerListener(drawerToggle);
 
-        nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        nvDrawer = findViewById(R.id.nvView);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 

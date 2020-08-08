@@ -41,11 +41,11 @@ public class ZoomEmailLoginActivity extends AppCompatActivity implements UserLog
         TextView mTitle = toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("Log in to Zoom");
 
-        mEdtUserName = (EditText)findViewById(R.id.userName);
-        mEdtPassord = (EditText)findViewById(R.id.password);
-        mBtnLogin = (Button)findViewById(R.id.btnLogin);
+        mEdtUserName = findViewById(R.id.userName);
+        mEdtPassord = findViewById(R.id.password);
+        mBtnLogin = findViewById(R.id.btnLogin);
         mBtnLogin.setOnClickListener(this);
-        mProgressPanel = (View)findViewById(R.id.progressPanel);
+        mProgressPanel = findViewById(R.id.progressPanel);
 
         // Try to log in with previous data
         SharedPreferences pref =

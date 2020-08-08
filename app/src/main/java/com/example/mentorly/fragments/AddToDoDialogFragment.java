@@ -36,9 +36,8 @@ public class AddToDoDialogFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static AddToDoDialogFragment newInstance(String title) {
-        AddToDoDialogFragment frag = new AddToDoDialogFragment();
-        return frag;
+    public static AddToDoDialogFragment newInstance() {
+        return new AddToDoDialogFragment();
     }
 
     @Override

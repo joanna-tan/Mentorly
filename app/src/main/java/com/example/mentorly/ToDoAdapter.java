@@ -46,12 +46,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         ToDoItem item = items.get(position);
         holder.bind(item);
 
-        if (item.getBody() == null || item.getBody().equals("")) {
-            isExpandable = false;
-        }
-        else {
-            isExpandable = true;
-        }
+        isExpandable = item.getBody() != null && !item.getBody().equals("");
 
         if (isExpandable) {
             final boolean isExpanded = position == mExpandedPosition;

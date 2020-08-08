@@ -23,9 +23,9 @@ public class ParseApplication extends Application {
         // clientKey is not needed unless explicitly configured
         // any network interceptors must be added with the Configuration Builder given this syntax
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("joanna-mentorly")
+                .applicationId("joanna-mentorly1")
                 .clientKey("JMentorParseAndMoveFast")
-                .server("https://joanna-mentorly.herokuapp.com/parse").build());
+                .server("https://joanna-mentorly1.herokuapp.com/parse").build());
 
     }
 }

@@ -30,8 +30,6 @@ public class BookmarkActivity extends AppCompatActivity {
     RecyclerView rvBookmarks;
     TextView tvNoBookmarks;
 
-    String pairUsername;
-    String pairId;
     ParseUser pairPartner;
 
     @Override
@@ -115,8 +113,6 @@ public class BookmarkActivity extends AppCompatActivity {
             // retrieve pairPartner data if it exists
             if (mentor != null) {
                 mentor.fetch();
-                pairId = pairPartner.getObjectId();
-                pairUsername = pairPartner.getUsername();
             } else {
                 Log.i(TAG, "No mentor found for " + user.getUsername());
             }
@@ -128,12 +124,10 @@ public class BookmarkActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }

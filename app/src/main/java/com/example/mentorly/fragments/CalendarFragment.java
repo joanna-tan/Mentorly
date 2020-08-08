@@ -270,13 +270,13 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
                 .start();
     }
 
-    private void checkPermission(int callbackId, String... permissionsId) {
+    private void checkPermission(String... permissionsId) {
         boolean permissions = true;
         for (String p : permissionsId) {
             permissions = permissions && ContextCompat.checkSelfPermission(getContext(), p) == PERMISSION_GRANTED;
         }
         if (!permissions)
-            requestPermissions(permissionsId, callbackId);
+            requestPermissions(permissionsId, CalendarFragment.RC_CALENDAR_PERMISSIONS);
         else {
             // set granted to true if yes permissions
             permissionsGranted = permissions;
@@ -590,7 +590,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
 
             emailUsername = account.getEmail();
             // First run a check to see if calendar permissions have already been granted
-            checkPermission(RC_CALENDAR_PERMISSIONS, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
+            checkPermission(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
             // Try to access calendars only if permission granted
             if (permissionsGranted) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -599,7 +599,7 @@ public class CalendarFragment extends Fragment implements AddEventDialogFragment
             }
             // If no calendar access, ask for user input again
             else {
-                checkPermission(RC_CALENDAR_PERMISSIONS, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
+                checkPermission(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR);
             }
 
             // Configure add event button

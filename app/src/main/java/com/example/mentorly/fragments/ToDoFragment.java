@@ -219,7 +219,7 @@ public class ToDoFragment extends Fragment implements AddToDoDialogFragment.AddT
 
     private void showAlertDialog() {
         FragmentManager fm = getParentFragmentManager();
-        AddToDoDialogFragment addToDoDialog = AddToDoDialogFragment.newInstance("Enter mentor name");
+        AddToDoDialogFragment addToDoDialog = AddToDoDialogFragment.newInstance();
         // Sets the to do fragment for use when dialog is finished
         addToDoDialog.setTargetFragment(ToDoFragment.this, 300);
         addToDoDialog.show(fm, "fragment_edit_name");

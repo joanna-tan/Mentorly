@@ -345,10 +345,9 @@ public class AddEventDialogFragment extends DialogFragment {
             minutes = String.valueOf(mins);
 
         // Append in a StringBuilder
-        String aTime = new StringBuilder().append(hours).append(':')
-                .append(minutes).append(" ").append(timeSet).toString();
 
-        return aTime;
+        return new StringBuilder().append(hours).append(':')
+                .append(minutes).append(" ").append(timeSet).toString();
     }
 
     // Defines the listener interface

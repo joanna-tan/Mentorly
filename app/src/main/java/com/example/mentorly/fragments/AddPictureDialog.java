@@ -1,5 +1,6 @@
 package com.example.mentorly.fragments;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 
@@ -25,6 +27,8 @@ import com.example.mentorly.BuildConfig;
 import com.example.mentorly.DeviceDimensionsHelper;
 import com.example.mentorly.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,6 +36,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 
 public class AddPictureDialog extends DialogFragment {
@@ -44,8 +49,11 @@ public class AddPictureDialog extends DialogFragment {
 
     // handle capture image info
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 242;
+    public static final int RC_CAMERA_PERMISSIONS = 139;
+    boolean permissionsGranted;
+
     File photoFile;
-    String photoFileName = "photo.jpg";
+    final String photoFileName = "photo.jpg";
 
     public AddPictureDialog() {
     }
@@ -65,7 +73,7 @@ public class AddPictureDialog extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ivPreviewPicture = view.findViewById(R.id.ivPreviewCapture);
         btnSubmit = view.findViewById(R.id.btnSubmitCapture);
@@ -77,8 +85,14 @@ public class AddPictureDialog extends DialogFragment {
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkPermission(Manifest.permission.CAMERA);
+
                 // Launch camera and hide the submit button
-                onLaunchCamera();
+                if (permissionsGranted) {
+                    onLaunchCamera();
+                } else {
+                    checkPermission(Manifest.permission.CAMERA);
+                }
             }
         });
 
@@ -88,7 +102,6 @@ public class AddPictureDialog extends DialogFragment {
             public void onClick(View view) {
                 if (photoFile == null || ivPreviewPicture.getDrawable() == null) {
                     Toast.makeText(getContext(), "There is no image!", Toast.LENGTH_SHORT).show();
-                    return;
                 }
                 else {
                     sendBackResult();
@@ -108,6 +121,19 @@ public class AddPictureDialog extends DialogFragment {
         AddPictureDialogListener listener = (AddPictureDialogListener) getTargetFragment();
         listener.onFinishAddPictureDialog(this.photoFile);
         dismiss();
+    }
+
+    private void checkPermission(String... permissionsId) {
+        boolean permissions = true;
+        for (String p : permissionsId) {
+            permissions = permissions && ContextCompat.checkSelfPermission(getContext(), p) == PERMISSION_GRANTED;
+        }
+        if (!permissions)
+            requestPermissions(permissionsId, AddPictureDialog.RC_CAMERA_PERMISSIONS);
+        else {
+            // set granted to true if yes permissions
+            permissionsGranted = permissions;
+        }
     }
 
     // Launches camera intent and saves image to file directory
@@ -162,8 +188,8 @@ public class AddPictureDialog extends DialogFragment {
                 // Load the taken image into a preview
                 ivPreviewPicture.setVisibility(View.VISIBLE);
                 btnSubmit.setVisibility(View.VISIBLE);
-                tvPreviewHeader.setText("Preview");
-                btnCapture.setText("Try again");
+                tvPreviewHeader.setText(R.string.preview);
+                btnCapture.setText(R.string.try_again_capture);
                 ivPreviewPicture.setImageBitmap(takenImage);
 
 
