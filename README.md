@@ -139,22 +139,24 @@ Optional:
     
 ## Walkthroughs
 ### General layout
-<img src='general_layout_v2.gif'/>
+<img src='general_layout_3.gif'/>
 
 ### Registering a new user
-<img src='register_walkthrough.gif'/>
+<img src='register_user.gif'/>
 
 ### Sending pair requests
-<img src='pair_req.gif'/>
+<img src='pair_request_side.gif'/>
 
 ### Live chat & bookmarks
-<img src='chat_updated.gif'/>
+<img src='live_chat_export2.gif'/>
 
 ### Update profile picture & add ToDo item
-<img src='camera_todo.gif'/>
-
-### Login and create Zoom event
-<img src='create_event_zoom.gif'/>
+<img src='to_do_item.gif'/>
 
 ### General event creation
-<img src='adding_events_all.gif'/>
+<img src='google_calendar_invites.gif'/>
+
+### Login and create Zoom event
+<img src='zoom_invite.gif'/>
+
+
