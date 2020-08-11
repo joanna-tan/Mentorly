@@ -141,7 +141,7 @@ Optional:
 ### General layout
 <img src='general_layout_3.gif'/>
 
-### Registering a new user
+### Registering a new user & add profile picture
 <img src='register_user.gif'/>
 
 ### Sending pair requests
@@ -150,7 +150,7 @@ Optional:
 ### Live chat & bookmarks
 <img src='live_chat_export2.gif'/>
 
-### Update profile picture & add ToDo item
+### ToDo items
 <img src='to_do_item.gif'/>
 
 ### General event creation
